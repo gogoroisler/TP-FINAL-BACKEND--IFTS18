@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+
+<h1>Bienvenido al Sistema de Expensas</h1>
+
+{% if user.is_authenticated %}
+    <p>Sesión iniciada como {{ user.username }}</p>
+{% else %}
+    <p>No has iniciado sesión</p>
+{% endif %}
+
+{% endblock %}
