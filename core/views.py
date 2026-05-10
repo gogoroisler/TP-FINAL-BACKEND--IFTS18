@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from .models import Perfil
+from .models import Perfil, Expensa, Departamento
+
 
 
 def home(request):
@@ -27,3 +28,18 @@ def panel_consorcista(request):
         return render(request, 'sin_permiso.html')
 
     return render(request, 'panel_consorcista.html')
+
+@login_required
+def mis_expensas(request):
+
+    departamento = Departamento.objects.get(usuario=request.user)
+
+    expensas = Expensa.objects.filter(
+        departamento=departamento
+    )
+
+    return render(
+        request,
+        'mis_expensas.html',
+        {'expensas': expensas}
+    )
