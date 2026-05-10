@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Perfil
+
+from .models import Perfil, Consorcio
+
 
 admin.site.register(Perfil)
-# Register your models here.
+admin.site.register(Consorcio)
