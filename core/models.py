@@ -30,3 +30,28 @@ class Consorcio(models.Model):
 
     def __str__(self):
         return self.nombre
+
+
+
+class Departamento(models.Model):
+
+    consorcio = models.ForeignKey(
+        Consorcio,
+        on_delete=models.CASCADE
+    )
+
+    numero = models.CharField(max_length=10)
+
+    piso = models.CharField(max_length=10)
+
+    propietario = models.CharField(max_length=100)
+
+    usuario = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    def __str__(self):
+        return f'Departamento {self.numero} - {self.consorcio.nombre}'
