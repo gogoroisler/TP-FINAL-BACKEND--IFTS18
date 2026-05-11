@@ -132,3 +132,28 @@ def editar_expensa(request, expensa_id):
             'expensa': expensa
         }
     )
+
+@login_required
+def eliminar_expensa(request, expensa_id):
+
+    perfil = Perfil.objects.get(usuario=request.user)
+
+    if perfil.rol != 'admin':
+        return render(request, 'sin_permiso.html')
+
+    expensa = get_object_or_404(
+        Expensa,
+        id=expensa_id
+    )
+
+    if request.method == 'POST':
+
+        expensa.delete()
+
+        return redirect('listar_expensas')
+
+    return render(
+        request,
+        'eliminar_expensa.html',
+        {'expensa': expensa}
+    )

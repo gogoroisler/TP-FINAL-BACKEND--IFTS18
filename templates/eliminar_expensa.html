@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Eliminar Expensa</h1>
+
+<p>
+    ¿Seguro que desea eliminar esta expensa?
+</p>
+
+<p>
+    {{ expensa }}
+</p>
+
+<form method="post">
+
+    {% csrf_token %}
+
+    <button type="submit">
+        Confirmar Eliminación
+    </button>
+
+</form>
+
+{% endblock %}

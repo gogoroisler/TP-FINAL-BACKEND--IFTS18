@@ -8,6 +8,7 @@ from core.views import (
     listar_expensas,
     crear_expensa,
     editar_expensa,
+    eliminar_expensa,
 )
 
 urlpatterns = [
@@ -28,4 +29,6 @@ urlpatterns = [
     path('crear-expensa/', crear_expensa, name='crear_expensa'),
 
     path('editar-expensa/<int:expensa_id>/', editar_expensa, name='editar_expensa'),
+
+    path('eliminar-expensa/<int:expensa_id>/', eliminar_expensa, name='eliminar_expensa'),
 ]
