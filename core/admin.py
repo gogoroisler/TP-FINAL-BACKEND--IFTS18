@@ -7,6 +7,8 @@ from .models import (
     Expensa
 )
 
+# Registro de modelos para administración desde Django Admin
+
 admin.site.register(Perfil)
 admin.site.register(Consorcio)
 admin.site.register(Departamento)

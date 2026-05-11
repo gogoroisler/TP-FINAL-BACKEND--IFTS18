@@ -13,32 +13,39 @@ def home(request):
     return render(request, 'home.html')
 
 
+# Vista exclusiva para administradores
 @login_required
 def panel_admin(request):
 
     perfil = Perfil.objects.get(usuario=request.user)
 
+# Verifica que el usuario sea administrador
     if perfil.rol != 'admin':
         return render(request, 'sin_permiso.html')
 
     return render(request, 'panel_admin.html')
 
 
+# Vista exclusiva para consorcistas
 @login_required
 def panel_consorcista(request):
 
     perfil = Perfil.objects.get(usuario=request.user)
 
+# Verifica que el usuario sea consorcista
     if perfil.rol != 'consorcista':
         return render(request, 'sin_permiso.html')
 
     return render(request, 'panel_consorcista.html')
 
+
+# Muestra únicamente las expensas del usuario logueado
 @login_required
 def mis_expensas(request):
 
     departamento = Departamento.objects.get(usuario=request.user)
-
+    
+# Obtiene únicamente las expensas del departamento del usuario
     expensas = Expensa.objects.filter(
         departamento=departamento
     )
@@ -49,7 +56,7 @@ def mis_expensas(request):
         {'expensas': expensas}
     )
 
-
+# Permite al administrador visualizar todas las expensas
 @login_required
 def listar_expensas(request):
 
@@ -66,6 +73,7 @@ def listar_expensas(request):
         {'expensas': expensas}
     )
 
+# Permite al administrador crear nuevas expensas
 @login_required
 def crear_expensa(request):
 
@@ -94,6 +102,7 @@ def crear_expensa(request):
         {'form': form}
     )
 
+# Permite modificar una expensa existente
 @login_required
 def editar_expensa(request, expensa_id):
 
@@ -133,6 +142,7 @@ def editar_expensa(request, expensa_id):
         }
     )
 
+# Permite eliminar expensas del sistema
 @login_required
 def eliminar_expensa(request, expensa_id):
 

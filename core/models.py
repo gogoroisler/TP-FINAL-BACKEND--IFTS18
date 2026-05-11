@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-
+# Modelo que relaciona usuarios con roles del sistema
 class Perfil(models.Model):
 
     ROLES = (
@@ -15,7 +15,7 @@ class Perfil(models.Model):
     def __str__(self):
         return self.usuario.username
 
-
+# Modelo que representa un consorcio o edificio
 class Consorcio(models.Model):
 
     nombre = models.CharField(max_length=100)
@@ -32,7 +32,7 @@ class Consorcio(models.Model):
         return self.nombre
 
 
-
+# Modelo que representa departamentos dentro de un consorcio
 class Departamento(models.Model):
 
     consorcio = models.ForeignKey(
@@ -56,6 +56,7 @@ class Departamento(models.Model):
     def __str__(self):
         return f'Departamento {self.numero} - {self.consorcio.nombre}'
 
+# Modelo que almacena las expensas de cada departamento
 class Expensa(models.Model):
 
     departamento = models.ForeignKey(

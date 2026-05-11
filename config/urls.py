@@ -11,6 +11,8 @@ from core.views import (
     eliminar_expensa,
 )
 
+# Rutas principales del sistema
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
