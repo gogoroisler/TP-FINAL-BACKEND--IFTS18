@@ -83,7 +83,8 @@ Perfil (rol)
 Departamento
    ↓
 Expensa
--```
+```
+
 ---
 
 # Instalación del proyecto
@@ -92,7 +93,7 @@ Expensa
 
 ```bash
 git clone https://github.com/gogoroisler/TP-FINAL-BACKEND--IFTS18.git
--```
+```
 
 ---
 
