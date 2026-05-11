@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Listado de Expensas</h1>
+
+<table border="1">
+
+    <tr>
+        <th>Departamento</th>
+        <th>Periodo</th>
+        <th>Monto</th>
+        <th>Vencimiento</th>
+        <th>Estado</th>
+    </tr>
+
+    {% for expensa in expensas %}
+
+    <tr>
+
+        <td>{{ expensa.departamento }}</td>
+
+        <td>{{ expensa.periodo }}</td>
+
+        <td>{{ expensa.monto }}</td>
+
+        <td>{{ expensa.fecha_vencimiento }}</td>
+
+        <td>
+
+            {% if expensa.pagada %}
+                Pagada
+            {% else %}
+                Pendiente
+            {% endif %}
+
+        </td>
+
+    </tr>
+
+    {% endfor %}
+
+</table>
+
+{% endblock %}

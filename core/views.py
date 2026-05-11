@@ -43,3 +43,20 @@ def mis_expensas(request):
         'mis_expensas.html',
         {'expensas': expensas}
     )
+
+
+@login_required
+def listar_expensas(request):
+
+    perfil = Perfil.objects.get(usuario=request.user)
+
+    if perfil.rol != 'admin':
+        return render(request, 'sin_permiso.html')
+
+    expensas = Expensa.objects.all()
+
+    return render(
+        request,
+        'listar_expensas.html',
+        {'expensas': expensas}
+    )
