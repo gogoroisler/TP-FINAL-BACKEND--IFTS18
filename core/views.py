@@ -1,4 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import (
+    render,
+    redirect,
+    get_object_or_404
+)
 from django.contrib.auth.decorators import login_required
 from .models import Perfil, Expensa, Departamento
 from .forms import ExpensaForm
@@ -88,4 +92,43 @@ def crear_expensa(request):
         request,
         'crear_expensa.html',
         {'form': form}
+    )
+
+@login_required
+def editar_expensa(request, expensa_id):
+
+    perfil = Perfil.objects.get(usuario=request.user)
+
+    if perfil.rol != 'admin':
+        return render(request, 'sin_permiso.html')
+
+    expensa = get_object_or_404(
+        Expensa,
+        id=expensa_id
+    )
+
+    if request.method == 'POST':
+
+        form = ExpensaForm(
+            request.POST,
+            instance=expensa
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            return redirect('listar_expensas')
+
+    else:
+
+        form = ExpensaForm(instance=expensa)
+
+    return render(
+        request,
+        'editar_expensa.html',
+        {
+            'form': form,
+            'expensa': expensa
+        }
     )

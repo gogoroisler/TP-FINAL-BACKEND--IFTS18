@@ -12,6 +12,7 @@
         <th>Monto</th>
         <th>Vencimiento</th>
         <th>Estado</th>
+        <th>Acciones</th>
     </tr>
 
     {% for expensa in expensas %}
@@ -35,7 +36,11 @@
             {% endif %}
 
         </td>
-
+        <td>
+            <a href="{% url 'editar_expensa' expensa.id %}">
+            Editar
+            </a>
+        </td>
     </tr>
 
     {% endfor %}
