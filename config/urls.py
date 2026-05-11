@@ -6,6 +6,7 @@ from core.views import (
     panel_consorcista,
     mis_expensas,
     listar_expensas,
+    crear_expensa,
 )
 
 urlpatterns = [
@@ -22,4 +23,6 @@ urlpatterns = [
     path('mis-expensas/', mis_expensas, name='mis_expensas'),
 
     path('listar-expensas/', listar_expensas, name='listar_expensas'),
+
+    path('crear-expensa/', crear_expensa, name='crear_expensa'),
 ]
