@@ -4,7 +4,8 @@ from django.shortcuts import (
     get_object_or_404
 )
 from django.contrib.auth.decorators import login_required
-from .models import Perfil, Expensa, Departamento
+from usuarios.models import Perfil
+from .models import Expensa, Departamento
 from .forms import ExpensaForm
 
 
