@@ -1,10 +1,11 @@
-<!-- Panel exclusivo para consorcistas -->
 {% extends 'base.html' %}
-
+{% block title %}Panel Consorcista{% endblock %}
 {% block content %}
-
 <h1>Panel Consorcista</h1>
+<p>Bienvenido, {{ user.username }}</p>
 
-<p>Bienvenido consorcista {{ user.username }}</p>
-
+<h2>Mis expensas</h2>
+<ul>
+    <li><a href="{% url 'mis_expensas' %}">Ver mis expensas</a></li>
+</ul>
 {% endblock %}

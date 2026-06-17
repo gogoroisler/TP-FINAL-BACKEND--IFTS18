@@ -1,10 +1,33 @@
-<!-- Panel exclusivo para administradores -->
 {% extends 'base.html' %}
-
+{% block title %}Panel Administrador{% endblock %}
 {% block content %}
-
 <h1>Panel Administrador</h1>
+<p>Bienvenido, {{ user.username }}</p>
 
-<p>Bienvenido administrador {{ user.username }}</p>
+<h2>Expensas</h2>
+<ul>
+    <li><a href="{% url 'seleccionar_preview' %}">Generar expensas del período</a></li>
+    <li><a href="{% url 'listar_expensas' %}">Ver todas las expensas</a></li>
+    <li><a href="{% url 'crear_expensa' %}">Crear expensa manual</a></li>
+</ul>
 
+<h2>Gastos</h2>
+<ul>
+    <li><a href="/admin/expensas/gastoconsorcio/add/">Cargar gasto del consorcio</a></li>
+    <li><a href="/admin/expensas/gastoconsorcio/">Ver todos los gastos</a></li>
+    <li><a href="/admin/expensas/proveedor/">Gestionar proveedores</a></li>
+</ul>
+
+<h2>Consorcios y departamentos</h2>
+<ul>
+    <li><a href="/admin/consorcios/consorcio/">Gestionar consorcios</a></li>
+    <li><a href="/admin/consorcios/departamento/">Gestionar departamentos</a></li>
+    <li><a href="/admin/consorcios/titularidad/">Gestionar titularidades</a></li>
+</ul>
+
+<h2>Usuarios</h2>
+<ul>
+    <li><a href="/admin/auth/user/">Gestionar usuarios</a></li>
+    <li><a href="/admin/usuarios/perfil/">Gestionar perfiles</a></li>
+</ul>
 {% endblock %}
