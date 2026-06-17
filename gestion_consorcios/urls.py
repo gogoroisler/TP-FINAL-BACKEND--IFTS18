@@ -9,6 +9,7 @@ from expensas.views import (
     CrearExpensaView,
     EditarExpensaView,
     EliminarExpensaView,
+    SeleccionarPreviewView,
     PreviewPeriodoView,
     enviar_expensas,
 )
@@ -26,6 +27,7 @@ urlpatterns = [
     path('crear-expensa/', CrearExpensaView.as_view(), name='crear_expensa'),
     path('editar-expensa/<int:expensa_id>/', EditarExpensaView.as_view(), name='editar_expensa'),
     path('eliminar-expensa/<int:expensa_id>/', EliminarExpensaView.as_view(), name='eliminar_expensa'),
+    path('generar-expensas/', SeleccionarPreviewView.as_view(), name='seleccionar_preview'),
     path('preview/<int:consorcio_id>/<str:periodo>/', PreviewPeriodoView.as_view(), name='preview_periodo'),
     path('enviar-expensas/<int:consorcio_id>/<str:periodo>/', enviar_expensas, name='enviar_expensas'),
 ]

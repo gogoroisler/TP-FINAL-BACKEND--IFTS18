@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Generar Expensas{% endblock %}
+{% block content %}
+<h1>Generar Expensas</h1>
+<form method="get" action="">
+    <label>Consorcio:</label>
+    <select name="consorcio_id">
+        {% for consorcio in consorcios %}
+        <option value="{{ consorcio.id }}">{{ consorcio.nombre }}</option>
+        {% endfor %}
+    </select>
+    <br><br>
+    <label>Periodo (YYYY-MM):</label>
+    <input type="text" name="periodo" placeholder="2026-06" maxlength="7">
+    <br><br>
+    <button type="submit">Ver preview</button>
+</form>
+{% endblock %}

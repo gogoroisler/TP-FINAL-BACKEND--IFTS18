@@ -100,6 +100,29 @@ class EliminarExpensaView(DeleteView):
 
 
 @method_decorator(login_required, name='dispatch')
+class SeleccionarPreviewView(TemplateView):
+    template_name = 'seleccionar_preview.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        perfil = get_perfil_por_usuario(request.user)
+        if perfil.rol != 'admin':
+            return render(request, 'sin_permiso.html')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['consorcios'] = Consorcio.objects.all()
+        return context
+
+    def get(self, request, *args, **kwargs):
+        consorcio_id = request.GET.get('consorcio_id')
+        periodo = request.GET.get('periodo')
+        if consorcio_id and periodo:
+            return redirect('preview_periodo', consorcio_id=consorcio_id, periodo=periodo)
+        return super().get(request, *args, **kwargs)
+
+
+@method_decorator(login_required, name='dispatch')
 class PreviewPeriodoView(TemplateView):
     template_name = 'preview_periodo.html'
 
