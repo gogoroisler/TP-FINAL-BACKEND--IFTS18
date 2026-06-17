@@ -1,15 +1,18 @@
+from decimal import Decimal
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView, TemplateView
 
+from consorcios.models import Consorcio
 from usuarios.selectors import get_perfil_por_usuario
 from .models import Expensa
 from .selectors import (
     get_todas_las_expensas,
     get_gastos_por_consorcio_periodo,
     generar_preview_periodo,
+    calcular_monto_departamento,
 )
 
 
@@ -94,3 +97,51 @@ class EliminarExpensaView(DeleteView):
         if perfil.rol != 'admin':
             return render(request, 'sin_permiso.html')
         return super().dispatch(request, *args, **kwargs)
+
+
+@method_decorator(login_required, name='dispatch')
+class PreviewPeriodoView(TemplateView):
+    template_name = 'preview_periodo.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        perfil = get_perfil_por_usuario(request.user)
+        if perfil.rol != 'admin':
+            return render(request, 'sin_permiso.html')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        consorcio_id = self.kwargs.get('consorcio_id')
+        periodo = self.kwargs.get('periodo')
+        consorcio = Consorcio.objects.get(id=consorcio_id)
+        context['preview'] = generar_preview_periodo(consorcio, periodo)
+        context['consorcio_id'] = consorcio_id
+        context['periodo'] = periodo
+        return context
+
+
+@login_required
+def enviar_expensas(request, consorcio_id, periodo):
+    perfil = get_perfil_por_usuario(request.user)
+    if perfil.rol != 'admin':
+        return render(request, 'sin_permiso.html')
+
+    if request.method == 'POST':
+        consorcio = Consorcio.objects.get(id=consorcio_id)
+        fecha_vencimiento = request.POST.get('fecha_vencimiento')
+        deptos = consorcio.departamento_set.all()
+
+        for depto in deptos:
+            monto = calcular_monto_departamento(depto, periodo)
+            Expensa.objects.update_or_create(
+                departamento=depto,
+                periodo=periodo,
+                defaults={
+                    'monto': monto,
+                    'fecha_vencimiento': fecha_vencimiento,
+                    'publicada': True,
+                }
+            )
+        return redirect('listar_expensas')
+
+    return redirect('listar_expensas')
