@@ -4,37 +4,77 @@
 ~/Escritorio/tpfinalborrador
 Rama: borrador -> sube a TP-FINAL-BACKEND--IFTS18
 
-## Puntos del docente
+## Correcciones según devoluciones del docente
 
-| # | Punto | Estado |
-|---|-------|--------|
+| # | Corrección | Estado |
+|---|------------|--------|
 | 1 | Config con nombre del proyecto | RESUELTO |
 | 2 | Modelos separados por app | RESUELTO |
 | 3 | Queries en selectors.py | RESUELTO |
-| 4 | Titularidad (historico titulares) | RESUELTO |
-| 5 | Apertura por proveedor | RESUELTO |
-| 6 | Vistas basadas en clases (CBV) | RESUELTO |
+| 4 | Registro histórico de titulares | RESUELTO |
+| 5 | Apertura de expensas por proveedor | RESUELTO |
+| 6 | Vistas basadas en clases CBV | RESUELTO |
+
+## Funcionalidades implementadas
+
+| Funcionalidad | Estado |
+|---------------|--------|
+| Login / logout / protección de rutas | OK |
+| Roles admin / consorcista | OK |
+| CRUD expensas (admin) | OK |
+| Gastos por proveedor (GastoConsorcio) | OK |
+| Gastos ordinarios y extraordinarios | OK |
+| Prorrateo proporcional / igualitario por m2 | OK |
+| Cálculo automático de expensa por departamento | OK |
+| Selector de consorcio y período para generar expensas | OK |
+| Vista previa antes de enviar expensas | OK |
+| Envío de expensas a consorcistas | OK |
+| Mis expensas (vista consorcista) | OK |
+| Informar pago | OK |
+| Histórico de titularidad por departamento | OK |
 
 ## Estructura de modelos
 - consorcios/models.py -> Consorcio, Departamento, Titularidad
-- expensas/models.py   -> Proveedor, Expensa, ItemExpensa
+- expensas/models.py   -> Proveedor, GastoConsorcio, Expensa
 - usuarios/models.py   -> Perfil (roles: admin / consorcista)
 - core/models.py       -> vacio
 
 ## Estructura de selectors
-- consorcios/selectors.py -> get_departamento_por_usuario, get_titularidad_activa
-- expensas/selectors.py   -> get_todas_las_expensas, get_expensas_por_departamento, get_expensa_por_id, get_items_por_expensa
+- consorcios/selectors.py -> get_departamento_por_usuario, get_titularidad_activa, get_departamento_por_titularidad, get_titular_en_periodo
+- expensas/selectors.py   -> get_todas_las_expensas, get_expensas_por_departamento, get_expensa_por_id, get_gastos_por_consorcio_periodo, calcular_monto_departamento, generar_preview_periodo, get_resumen_gastos_periodo
 - usuarios/selectors.py   -> get_perfil_por_usuario
 
 ## Estructura de vistas (CBV)
-- core/views.py       -> home (FBV), PanelAdminView, PanelConsorcistView
-- consorcios/views.py -> MisExpensasView
-- expensas/views.py   -> ListarExpensasView, CrearExpensaView, EditarExpensaView, EliminarExpensaView
+- core/views.py       -> home, PanelAdminView, PanelConsorcistView
+- consorcios/views.py -> MisExpensasView, informar_pago
+- expensas/views.py   -> ListarExpensasView, DetalleExpensaView, CrearExpensaView, EditarExpensaView, EliminarExpensaView, SeleccionarPreviewView, PreviewPeriodoView, enviar_expensas
 
 ## URLs
 - gestion_consorcios/urls.py -> todas las rutas apuntan a sus CBV
 
-## Pendientes opcionales
-- Integrar ItemExpensa en templates (mostrar desglose por proveedor)
-- Integrar Titularidad en logica de vistas
-- Mejorar templates con CSS
+## Bugs conocidos
+- Sin manejo de errores para usuarios sin Perfil (rompe el sistema)
+- No hay validación de formato YYYY-MM en período
+- panel_admin y panel_consorcista están vacíos (solo muestran saludo)
+
+## Pendientes antes del CSS (por prioridad)
+
+### Alta prioridad
+- [ ] Mejorar paneles admin y consorcista con links a funcionalidades
+- [ ] Manejo de errores para usuarios sin Perfil
+
+### Media prioridad
+- [ ] Redirect automático según rol al loguearse
+- [ ] Validación de formato de período (YYYY-MM)
+- [ ] Registro de usuarios desde el frontend
+
+### Consideraciones MVP
+- [ ] Historial de pagos (fecha y monto, no solo booleano)
+- [ ] Módulo de reclamos (mencionado en README)
+- [ ] Avisos/novedades del admin al consorcio
+
+## Próximos pasos
+1. Resolver pendientes alta prioridad
+2. Resolver pendientes media prioridad
+3. Evaluar módulo de reclamos
+4. CSS y mejoras visuales
