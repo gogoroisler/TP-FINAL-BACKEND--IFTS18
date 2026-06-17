@@ -11,39 +11,30 @@ Rama: borrador -> sube a TP-FINAL-BACKEND--IFTS18
 | 1 | Config con nombre del proyecto | RESUELTO |
 | 2 | Modelos separados por app | RESUELTO |
 | 3 | Queries en selectors.py | RESUELTO |
-| 4 | Titularidad (historico titulares) | RESUELTO (modelo creado en consorcios) |
-| 5 | Apertura por proveedor | PENDIENTE |
-| 6 | Vistas basadas en clases (CBV) | PENDIENTE - siguiente paso |
+| 4 | Titularidad (historico titulares) | RESUELTO |
+| 5 | Apertura por proveedor | RESUELTO |
+| 6 | Vistas basadas en clases (CBV) | RESUELTO |
 
-## Estructura de modelos actual
+## Estructura de modelos
 - consorcios/models.py -> Consorcio, Departamento, Titularidad
-- expensas/models.py   -> Expensa
+- expensas/models.py   -> Proveedor, Expensa, ItemExpensa
 - usuarios/models.py   -> Perfil (roles: admin / consorcista)
 - core/models.py       -> vacio
 
-## Estructura de selectors actual
+## Estructura de selectors
 - consorcios/selectors.py -> get_departamento_por_usuario, get_titularidad_activa
-- expensas/selectors.py   -> get_todas_las_expensas, get_expensas_por_departamento, get_expensa_por_id
+- expensas/selectors.py   -> get_todas_las_expensas, get_expensas_por_departamento, get_expensa_por_id, get_items_por_expensa
 - usuarios/selectors.py   -> get_perfil_por_usuario
 
-## Vistas actuales (FBV en core/views.py - pendiente migrar a CBV)
-- home
-- panel_admin
-- panel_consorcista
-- mis_expensas
-- listar_expensas
-- crear_expensa
-- editar_expensa
-- eliminar_expensa
+## Estructura de vistas (CBV)
+- core/views.py       -> home (FBV), PanelAdminView, PanelConsorcistView
+- consorcios/views.py -> MisExpensasView
+- expensas/views.py   -> ListarExpensasView, CrearExpensaView, EditarExpensaView, EliminarExpensaView
 
-## URLs (gestion_consorcios/urls.py)
-Todas apuntan a core.views - hay que actualizar cuando migremos a CBV
+## URLs
+- gestion_consorcios/urls.py -> todas las rutas apuntan a sus CBV
 
-## Proximo paso
-Migrar core/views.py a CBV usando:
-- TemplateView -> panel_admin, panel_consorcista
-- ListView     -> listar_expensas, mis_expensas
-- CreateView   -> crear_expensa
-- UpdateView   -> editar_expensa
-- DeleteView   -> eliminar_expensa
-El control de roles va en el metodo dispatch() de cada clase.
+## Pendientes opcionales
+- Integrar ItemExpensa en templates (mostrar desglose por proveedor)
+- Integrar Titularidad en logica de vistas
+- Mejorar templates con CSS
