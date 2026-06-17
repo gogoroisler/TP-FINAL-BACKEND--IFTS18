@@ -1,5 +1,6 @@
 from django.db import models
 from consorcios.models import Consorcio, Departamento
+from .validators import validar_formato_periodo
 
 
 class Proveedor(models.Model):
@@ -27,7 +28,11 @@ class GastoConsorcio(models.Model):
 
     consorcio = models.ForeignKey(Consorcio, on_delete=models.CASCADE)
     proveedor = models.ForeignKey(Proveedor, on_delete=models.PROTECT)
-    periodo = models.CharField(max_length=7, help_text='Formato: YYYY-MM')
+    periodo = models.CharField(
+        max_length=7,
+        validators=[validar_formato_periodo],
+        help_text='Formato: YYYY-MM'
+    )
     descripcion = models.CharField(max_length=200)
     monto = models.DecimalField(max_digits=10, decimal_places=2)
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='ordinario')
@@ -55,7 +60,11 @@ class GastoConsorcio(models.Model):
 
 class Expensa(models.Model):
     departamento = models.ForeignKey(Departamento, on_delete=models.CASCADE)
-    periodo = models.CharField(max_length=7, help_text='Formato: YYYY-MM')
+    periodo = models.CharField(
+        max_length=7,
+        validators=[validar_formato_periodo],
+        help_text='Formato: YYYY-MM'
+    )
     monto = models.DecimalField(max_digits=10, decimal_places=2)
     fecha_vencimiento = models.DateField()
     pagada = models.BooleanField(default=False)
