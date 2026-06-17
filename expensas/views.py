@@ -6,7 +6,11 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView, D
 
 from usuarios.selectors import get_perfil_por_usuario
 from .models import Expensa
-from .selectors import get_todas_las_expensas, get_expensas_por_departamento, get_items_por_expensa
+from .selectors import (
+    get_todas_las_expensas,
+    get_gastos_por_consorcio_periodo,
+    generar_preview_periodo,
+)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -40,7 +44,12 @@ class DetalleExpensaView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['items'] = get_items_por_expensa(self.object)
+        expensa = self.object
+        gastos = get_gastos_por_consorcio_periodo(
+            expensa.departamento.consorcio,
+            expensa.periodo
+        )
+        context['gastos'] = gastos
         return context
 
 
@@ -48,7 +57,7 @@ class DetalleExpensaView(DetailView):
 class CrearExpensaView(CreateView):
     model = Expensa
     template_name = 'crear_expensa.html'
-    fields = ['departamento', 'periodo', 'monto', 'fecha_vencimiento', 'pagada']
+    fields = ['departamento', 'periodo', 'fecha_vencimiento']
     success_url = reverse_lazy('listar_expensas')
 
     def dispatch(self, request, *args, **kwargs):
@@ -62,7 +71,7 @@ class CrearExpensaView(CreateView):
 class EditarExpensaView(UpdateView):
     model = Expensa
     template_name = 'editar_expensa.html'
-    fields = ['departamento', 'periodo', 'monto', 'fecha_vencimiento', 'pagada']
+    fields = ['departamento', 'periodo', 'fecha_vencimiento', 'pagada']
     success_url = reverse_lazy('listar_expensas')
     pk_url_kwarg = 'expensa_id'
 

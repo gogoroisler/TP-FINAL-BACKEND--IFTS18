@@ -18,6 +18,7 @@ class Departamento(models.Model):
     numero = models.CharField(max_length=10)
     piso = models.CharField(max_length=10)
     propietario = models.CharField(max_length=100)
+    metros_cuadrados = models.DecimalField(max_digits=7, decimal_places=2, default=0)
     usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
