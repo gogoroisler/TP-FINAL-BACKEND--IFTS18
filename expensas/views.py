@@ -2,11 +2,11 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 
 from usuarios.selectors import get_perfil_por_usuario
 from .models import Expensa
-from .selectors import get_todas_las_expensas
+from .selectors import get_todas_las_expensas, get_expensas_por_departamento, get_items_por_expensa
 
 
 @method_decorator(login_required, name='dispatch')
@@ -23,6 +23,25 @@ class ListarExpensasView(ListView):
 
     def get_queryset(self):
         return get_todas_las_expensas()
+
+
+@method_decorator(login_required, name='dispatch')
+class DetalleExpensaView(DetailView):
+    model = Expensa
+    template_name = 'detalle_expensa.html'
+    context_object_name = 'expensa'
+    pk_url_kwarg = 'expensa_id'
+
+    def dispatch(self, request, *args, **kwargs):
+        perfil = get_perfil_por_usuario(request.user)
+        if perfil.rol != 'admin':
+            return render(request, 'sin_permiso.html')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['items'] = get_items_por_expensa(self.object)
+        return context
 
 
 @method_decorator(login_required, name='dispatch')

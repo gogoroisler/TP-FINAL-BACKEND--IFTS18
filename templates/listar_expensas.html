@@ -1,12 +1,8 @@
-<!-- Listado general de expensas -->
 {% extends 'base.html' %}
-
 {% block content %}
-
 <h1>Listado de Expensas</h1>
-
+<a href="{% url 'crear_expensa' %}">Crear nueva expensa</a>
 <table border="1">
-
     <tr>
         <th>Departamento</th>
         <th>Periodo</th>
@@ -15,41 +11,19 @@
         <th>Estado</th>
         <th>Acciones</th>
     </tr>
-
     {% for expensa in expensas %}
-
     <tr>
-
         <td>{{ expensa.departamento }}</td>
-
         <td>{{ expensa.periodo }}</td>
-
-        <td>{{ expensa.monto }}</td>
-
+        <td>${{ expensa.monto }}</td>
         <td>{{ expensa.fecha_vencimiento }}</td>
-
+        <td>{% if expensa.pagada %}Pagada{% else %}Pendiente{% endif %}</td>
         <td>
-
-            {% if expensa.pagada %}
-                Pagada
-            {% else %}
-                Pendiente
-            {% endif %}
-
-        </td>
-        <td>
-            <a href="{% url 'editar_expensa' expensa.id %}">
-            Editar
-            </a>
-        <br>
-            <a href="{% url 'eliminar_expensa' expensa.id %}">
-            Eliminar
-            </a>
+            <a href="{% url 'detalle_expensa' expensa.id %}">Ver</a> |
+            <a href="{% url 'editar_expensa' expensa.id %}">Editar</a> |
+            <a href="{% url 'eliminar_expensa' expensa.id %}">Eliminar</a>
         </td>
     </tr>
-
     {% endfor %}
-
 </table>
-
 {% endblock %}
