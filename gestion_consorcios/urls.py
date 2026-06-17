@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from core.views import home, PanelAdminView, PanelConsorcistView
-from consorcios.views import MisExpensasView
+from consorcios.views import MisExpensasView, informar_pago
 from expensas.views import (
     ListarExpensasView,
     DetalleExpensaView,
@@ -20,6 +20,7 @@ urlpatterns = [
     path('panel-admin/', PanelAdminView.as_view(), name='panel_admin'),
     path('panel-consorcista/', PanelConsorcistView.as_view(), name='panel_consorcista'),
     path('mis-expensas/', MisExpensasView.as_view(), name='mis_expensas'),
+    path('informar-pago/<int:expensa_id>/', informar_pago, name='informar_pago'),
     path('listar-expensas/', ListarExpensasView.as_view(), name='listar_expensas'),
     path('expensa/<int:expensa_id>/', DetalleExpensaView.as_view(), name='detalle_expensa'),
     path('crear-expensa/', CrearExpensaView.as_view(), name='crear_expensa'),

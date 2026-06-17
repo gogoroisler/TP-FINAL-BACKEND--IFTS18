@@ -1,37 +1,43 @@
-<!-- Muestra las expensas del usuario logueado -->
 {% extends 'base.html' %}
-
+{% block title %}Mis Expensas{% endblock %}
 {% block content %}
-
 <h1>Mis Expensas</h1>
 
-<table border="1">
+{% if departamento %}
+<p><strong>Consorcio:</strong> {{ departamento.consorcio }}</p>
+<p><strong>Departamento:</strong> {{ departamento }}</p>
+{% endif %}
 
+{% if expensas %}
+<table border="1">
     <tr>
         <th>Periodo</th>
-        <th>Monto</th>
+        <th>Monto a pagar</th>
         <th>Vencimiento</th>
         <th>Estado</th>
+        <th>Accion</th>
     </tr>
-
     {% for expensa in expensas %}
-
     <tr>
         <td>{{ expensa.periodo }}</td>
-        <td>{{ expensa.monto }}</td>
+        <td>${{ expensa.monto }}</td>
         <td>{{ expensa.fecha_vencimiento }}</td>
-
+        <td>{% if expensa.pagada %}Pagada{% else %}Pendiente{% endif %}</td>
         <td>
-            {% if expensa.pagada %}
-                Pagada
+            {% if not expensa.pagada %}
+            <form method="post" action="{% url 'informar_pago' expensa.id %}">
+                {% csrf_token %}
+                <button type="submit">Informar pago</button>
+            </form>
             {% else %}
-                Pendiente
+            -
             {% endif %}
         </td>
     </tr>
-
     {% endfor %}
-
 </table>
+{% else %}
+<p>No tenés expensas registradas todavía.</p>
+{% endif %}
 
 {% endblock %}

@@ -91,3 +91,12 @@ def generar_preview_periodo(consorcio, periodo):
         'total_consorcio': total_consorcio,
         'detalle': preview,
     }
+
+
+def get_resumen_gastos_periodo(consorcio, periodo):
+    gastos = get_gastos_por_consorcio_periodo(consorcio, periodo)
+    total = sum(g.monto for g in gastos)
+    return {
+        'gastos': gastos,
+        'total': total,
+    }
