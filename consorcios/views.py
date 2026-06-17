@@ -4,8 +4,8 @@ from django.utils.decorators import method_decorator
 from django.views.generic import ListView
 
 from consorcios.selectors import get_departamento_por_titularidad, get_departamento_por_usuario
-from expensas.selectors import get_expensas_por_departamento, get_resumen_gastos_periodo
-from expensas.models import Expensa
+from expensas.models import Expensa, Pago
+from expensas.selectors import get_expensas_por_departamento, get_pagos_por_expensa
 from usuarios.mixins import RolRequeridoMixin
 from usuarios.selectors import get_perfil_por_usuario
 
@@ -31,6 +31,13 @@ class MisExpensasView(RolRequeridoMixin, ListView):
         if not departamento:
             departamento = get_departamento_por_usuario(self.request.user)
         context['departamento'] = departamento
+        expensas_con_pagos = []
+        for expensa in context['expensas']:
+            expensas_con_pagos.append({
+                'expensa': expensa,
+                'pagos': get_pagos_por_expensa(expensa),
+            })
+        context['expensas_con_pagos'] = expensas_con_pagos
         return context
 
 
@@ -41,6 +48,13 @@ def informar_pago(request, expensa_id):
         return render(request, 'sin_perfil.html')
     expensa = get_object_or_404(Expensa, id=expensa_id)
     if request.method == 'POST':
+        monto = request.POST.get('monto', expensa.monto)
+        nota = request.POST.get('nota', '')
+        Pago.objects.create(
+            expensa=expensa,
+            monto=monto,
+            nota=nota,
+        )
         expensa.pagada = True
         expensa.save()
     return redirect('mis_expensas')

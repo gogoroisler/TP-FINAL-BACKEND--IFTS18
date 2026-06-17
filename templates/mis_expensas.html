@@ -8,34 +8,43 @@
 <p><strong>Departamento:</strong> {{ departamento }}</p>
 {% endif %}
 
-{% if expensas %}
+{% if expensas_con_pagos %}
+{% for item in expensas_con_pagos %}
+<h2>Período {{ item.expensa.periodo }}</h2>
+<p><strong>Monto:</strong> ${{ item.expensa.monto }}</p>
+<p><strong>Vencimiento:</strong> {{ item.expensa.fecha_vencimiento }}</p>
+<p><strong>Estado:</strong> {% if item.expensa.pagada %}Pagada{% else %}Pendiente{% endif %}</p>
+
+{% if item.pagos %}
+<h3>Historial de pagos</h3>
 <table border="1">
     <tr>
-        <th>Periodo</th>
-        <th>Monto a pagar</th>
-        <th>Vencimiento</th>
-        <th>Estado</th>
-        <th>Accion</th>
+        <th>Fecha</th>
+        <th>Monto</th>
+        <th>Nota</th>
     </tr>
-    {% for expensa in expensas %}
+    {% for pago in item.pagos %}
     <tr>
-        <td>{{ expensa.periodo }}</td>
-        <td>${{ expensa.monto }}</td>
-        <td>{{ expensa.fecha_vencimiento }}</td>
-        <td>{% if expensa.pagada %}Pagada{% else %}Pendiente{% endif %}</td>
-        <td>
-            {% if not expensa.pagada %}
-            <form method="post" action="{% url 'informar_pago' expensa.id %}">
-                {% csrf_token %}
-                <button type="submit">Informar pago</button>
-            </form>
-            {% else %}
-            -
-            {% endif %}
-        </td>
+        <td>{{ pago.fecha }}</td>
+        <td>${{ pago.monto }}</td>
+        <td>{{ pago.nota }}</td>
     </tr>
     {% endfor %}
 </table>
+{% endif %}
+
+{% if not item.expensa.pagada %}
+<form method="post" action="{% url 'informar_pago' item.expensa.id %}">
+    {% csrf_token %}
+    <label>Monto pagado:</label>
+    <input type="number" name="monto" value="{{ item.expensa.monto }}" step="0.01" required>
+    <label>Nota (opcional):</label>
+    <input type="text" name="nota" placeholder="Numero de comprobante, etc.">
+    <button type="submit">Informar pago</button>
+</form>
+{% endif %}
+<hr>
+{% endfor %}
 {% else %}
 <p>No tenés expensas registradas todavía.</p>
 {% endif %}

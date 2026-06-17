@@ -100,3 +100,8 @@ def get_resumen_gastos_periodo(consorcio, periodo):
         'gastos': gastos,
         'total': total,
     }
+
+
+def get_pagos_por_expensa(expensa):
+    from .models import Pago
+    return Pago.objects.filter(expensa=expensa).order_by('-fecha')

@@ -73,3 +73,17 @@ class Expensa(models.Model):
 
     def __str__(self):
         return f'{self.departamento} - {self.periodo}'
+
+
+class Pago(models.Model):
+    expensa = models.ForeignKey(
+        Expensa,
+        on_delete=models.CASCADE,
+        related_name='pagos'
+    )
+    fecha = models.DateField(auto_now_add=True)
+    monto = models.DecimalField(max_digits=10, decimal_places=2)
+    nota = models.CharField(max_length=200, blank=True)
+
+    def __str__(self):
+        return f'Pago {self.expensa} - {self.fecha} - ${self.monto}'
