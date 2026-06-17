@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 
-from usuarios.selectors import get_perfil_por_usuario
+from usuarios.mixins import RolRequeridoMixin
 
 
 def home(request):
@@ -11,22 +11,12 @@ def home(request):
 
 
 @method_decorator(login_required, name='dispatch')
-class PanelAdminView(TemplateView):
+class PanelAdminView(RolRequeridoMixin, TemplateView):
+    rol_requerido = 'admin'
     template_name = 'panel_admin.html'
-
-    def dispatch(self, request, *args, **kwargs):
-        perfil = get_perfil_por_usuario(request.user)
-        if perfil.rol != 'admin':
-            return render(request, 'sin_permiso.html')
-        return super().dispatch(request, *args, **kwargs)
 
 
 @method_decorator(login_required, name='dispatch')
-class PanelConsorcistView(TemplateView):
+class PanelConsorcistView(RolRequeridoMixin, TemplateView):
+    rol_requerido = 'consorcista'
     template_name = 'panel_consorcista.html'
-
-    def dispatch(self, request, *args, **kwargs):
-        perfil = get_perfil_por_usuario(request.user)
-        if perfil.rol != 'consorcista':
-            return render(request, 'sin_permiso.html')
-        return super().dispatch(request, *args, **kwargs)
