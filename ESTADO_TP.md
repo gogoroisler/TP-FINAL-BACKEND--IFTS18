@@ -21,10 +21,13 @@ Rama: borrador -> sube a TP-FINAL-BACKEND--IFTS18
 |---------------|--------|
 | Login / logout / protección de rutas | OK |
 | Roles admin / consorcista | OK |
+| Redirect automático según rol al loguearse | OK |
+| Manejo de usuarios sin Perfil | OK |
 | CRUD expensas (admin) | OK |
 | Gastos por proveedor (GastoConsorcio) | OK |
 | Gastos ordinarios y extraordinarios | OK |
 | Prorrateo proporcional / igualitario por m2 | OK |
+| Validación de formato YYYY-MM en período | OK |
 | Cálculo automático de expensa por departamento | OK |
 | Selector de consorcio y período para generar expensas | OK |
 | Vista previa antes de enviar expensas | OK |
@@ -32,6 +35,9 @@ Rama: borrador -> sube a TP-FINAL-BACKEND--IFTS18
 | Mis expensas (vista consorcista) | OK |
 | Informar pago | OK |
 | Histórico de titularidad por departamento | OK |
+| Panel admin con links a funcionalidades | OK |
+| Panel consorcista con links a funcionalidades | OK |
+| RolRequeridoMixin reutilizable | OK |
 
 ## Estructura de modelos
 - consorcios/models.py -> Consorcio, Departamento, Titularidad
@@ -48,24 +54,16 @@ Rama: borrador -> sube a TP-FINAL-BACKEND--IFTS18
 - core/views.py       -> home, PanelAdminView, PanelConsorcistView
 - consorcios/views.py -> MisExpensasView, informar_pago
 - expensas/views.py   -> ListarExpensasView, DetalleExpensaView, CrearExpensaView, EditarExpensaView, EliminarExpensaView, SeleccionarPreviewView, PreviewPeriodoView, enviar_expensas
+- usuarios/views.py   -> redirigir_segun_rol
+- usuarios/mixins.py  -> RolRequeridoMixin
 
 ## URLs
 - gestion_consorcios/urls.py -> todas las rutas apuntan a sus CBV
+- LOGIN_REDIRECT_URL -> /redirigir/ (redirect automatico segun rol)
 
-## Bugs conocidos
-- Sin manejo de errores para usuarios sin Perfil (rompe el sistema)
-- No hay validación de formato YYYY-MM en período
-- panel_admin y panel_consorcista están vacíos (solo muestran saludo)
-
-## Pendientes antes del CSS (por prioridad)
-
-### Alta prioridad
-- [ ] Mejorar paneles admin y consorcista con links a funcionalidades
-- [ ] Manejo de errores para usuarios sin Perfil
+## Pendientes
 
 ### Media prioridad
-- [ ] Redirect automático según rol al loguearse
-- [ ] Validación de formato de período (YYYY-MM)
 - [ ] Registro de usuarios desde el frontend
 
 ### Consideraciones MVP
@@ -73,8 +71,6 @@ Rama: borrador -> sube a TP-FINAL-BACKEND--IFTS18
 - [ ] Módulo de reclamos (mencionado en README)
 - [ ] Avisos/novedades del admin al consorcio
 
-## Próximos pasos
-1. Resolver pendientes alta prioridad
-2. Resolver pendientes media prioridad
-3. Evaluar módulo de reclamos
-4. CSS y mejoras visuales
+### Después del CSS
+- [ ] Mejorar templates con estilos
+- [ ] README actualizado con nuevas funcionalidades
