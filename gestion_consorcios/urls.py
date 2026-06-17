@@ -13,11 +13,13 @@ from expensas.views import (
     PreviewPeriodoView,
     enviar_expensas,
 )
+from usuarios.views import redirigir_segun_rol
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('', home, name='home'),
+    path('redirigir/', redirigir_segun_rol, name='redirigir_segun_rol'),
     path('panel-admin/', PanelAdminView.as_view(), name='panel_admin'),
     path('panel-consorcista/', PanelConsorcistView.as_view(), name='panel_consorcista'),
     path('mis-expensas/', MisExpensasView.as_view(), name='mis_expensas'),
