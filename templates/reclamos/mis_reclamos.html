@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Mis Reclamos{% endblock %}
+{% block content %}
+<h1>Mis Reclamos</h1>
+<a href="{% url 'crear_reclamo' %}">Nuevo reclamo</a>
+
+{% if reclamos %}
+<table border="1">
+    <tr>
+        <th>Titulo</th>
+        <th>Descripcion</th>
+        <th>Estado</th>
+        <th>Fecha</th>
+    </tr>
+    {% for reclamo in reclamos %}
+    <tr>
+        <td>{{ reclamo.titulo }}</td>
+        <td>{{ reclamo.descripcion }}</td>
+        <td>{{ reclamo.get_estado_display }}</td>
+        <td>{{ reclamo.fecha_creacion|date:"d/m/Y" }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No tenés reclamos registrados.</p>
+{% endif %}
+{% endblock %}

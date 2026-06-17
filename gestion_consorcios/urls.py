@@ -14,6 +14,12 @@ from expensas.views import (
     enviar_expensas,
 )
 from usuarios.views import redirigir_segun_rol
+from reclamos.views import (
+    CrearReclamoView,
+    MisReclamosView,
+    ListarReclamosView,
+    actualizar_estado,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,4 +38,8 @@ urlpatterns = [
     path('generar-expensas/', SeleccionarPreviewView.as_view(), name='seleccionar_preview'),
     path('preview/<int:consorcio_id>/<str:periodo>/', PreviewPeriodoView.as_view(), name='preview_periodo'),
     path('enviar-expensas/<int:consorcio_id>/<str:periodo>/', enviar_expensas, name='enviar_expensas'),
+    path('mis-reclamos/', MisReclamosView.as_view(), name='mis_reclamos'),
+    path('crear-reclamo/', CrearReclamoView.as_view(), name='crear_reclamo'),
+    path('reclamos/', ListarReclamosView.as_view(), name='listar_reclamos'),
+    path('reclamos/actualizar/<int:reclamo_id>/', actualizar_estado, name='actualizar_estado'),
 ]

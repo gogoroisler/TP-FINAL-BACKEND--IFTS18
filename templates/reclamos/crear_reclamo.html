@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Nuevo Reclamo{% endblock %}
+{% block content %}
+<h1>Nuevo Reclamo</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Enviar reclamo</button>
+</form>
+<a href="{% url 'mis_reclamos' %}">Volver a mis reclamos</a>
+{% endblock %}

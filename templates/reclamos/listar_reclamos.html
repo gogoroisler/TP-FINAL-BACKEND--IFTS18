@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Reclamos{% endblock %}
+{% block content %}
+<h1>Reclamos del consorcio</h1>
+
+{% if reclamos %}
+<table border="1">
+    <tr>
+        <th>Departamento</th>
+        <th>Titulo</th>
+        <th>Descripcion</th>
+        <th>Estado</th>
+        <th>Fecha</th>
+        <th>Actualizar estado</th>
+    </tr>
+    {% for reclamo in reclamos %}
+    <tr>
+        <td>{{ reclamo.departamento }}</td>
+        <td>{{ reclamo.titulo }}</td>
+        <td>{{ reclamo.descripcion }}</td>
+        <td>{{ reclamo.get_estado_display }}</td>
+        <td>{{ reclamo.fecha_creacion|date:"d/m/Y" }}</td>
+        <td>
+            <form method="post" action="{% url 'actualizar_estado' reclamo.id %}">
+                {% csrf_token %}
+                <select name="estado">
+                    <option value="pendiente" {% if reclamo.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                    <option value="en_proceso" {% if reclamo.estado == 'en_proceso' %}selected{% endif %}>En proceso</option>
+                    <option value="resuelto" {% if reclamo.estado == 'resuelto' %}selected{% endif %}>Resuelto</option>
+                </select>
+                <button type="submit">Actualizar</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No hay reclamos registrados.</p>
+{% endif %}
+{% endblock %}
