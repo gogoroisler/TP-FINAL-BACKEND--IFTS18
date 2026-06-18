@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Solicitudes de vinculación{% endblock %}
+{% block content %}
+<h1>Solicitudes de vinculación</h1>
+<a href="{% url 'panel_admin' %}">← Volver al panel</a>
+<br><br>
+{% if solicitudes %}
+<table border="1">
+    <tr>
+        <th>Usuario</th>
+        <th>Consorcio</th>
+        <th>Departamento</th>
+        <th>Estado</th>
+        <th>Fecha</th>
+        <th>Accion</th>
+    </tr>
+    {% for solicitud in solicitudes %}
+    <tr>
+        <td>{{ solicitud.usuario }}</td>
+        <td>{{ solicitud.consorcio }}</td>
+        <td>{{ solicitud.departamento }}</td>
+        <td>{{ solicitud.get_estado_display }}</td>
+        <td>{{ solicitud.fecha|date:"d/m/Y" }}</td>
+        <td>
+            {% if solicitud.estado == 'pendiente' %}
+            <form method="post" action="{% url 'gestionar_solicitud' solicitud.id %}">
+                {% csrf_token %}
+                <input type="text" name="nota_admin" placeholder="Nota (opcional)">
+                <button type="submit" name="accion" value="aprobar">Aprobar</button>
+                <button type="submit" name="accion" value="rechazar">Rechazar</button>
+            </form>
+            {% elif solicitud.estado == 'aprobada' %}
+            <form method="post" action="{% url 'retirar_permisos' solicitud.id %}">
+                {% csrf_token %}
+                <input type="text" name="nota_admin" placeholder="Motivo (opcional)">
+                <button type="submit">Retirar permisos</button>
+            </form>
+            {% else %}
+            Rechazada
+            {% if solicitud.nota_admin %} - {{ solicitud.nota_admin }}{% endif %}
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No hay solicitudes registradas.</p>
+{% endif %}
+{% endblock %}

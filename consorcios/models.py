@@ -33,3 +33,21 @@ class Titularidad(models.Model):
 
     def __str__(self):
         return f'{self.usuario} - {self.departamento}'
+
+
+class SolicitudVinculacion(models.Model):
+    ESTADO_CHOICES = [
+        ('pendiente', 'Pendiente'),
+        ('aprobada', 'Aprobada'),
+        ('rechazada', 'Rechazada'),
+    ]
+
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    consorcio = models.ForeignKey(Consorcio, on_delete=models.CASCADE)
+    departamento = models.ForeignKey(Departamento, on_delete=models.CASCADE)
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')
+    fecha = models.DateTimeField(auto_now_add=True)
+    nota_admin = models.CharField(max_length=200, blank=True)
+
+    def __str__(self):
+        return f'{self.usuario} - {self.departamento} - {self.estado}'

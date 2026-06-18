@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Solicitud rechazada{% endblock %}
+{% block content %}
+<h1>Solicitud rechazada</h1>
+<p>Tu solicitud de vinculación fue rechazada por el administrador.</p>
+{% if solicitud.nota_admin %}
+<p><strong>Motivo:</strong> {{ solicitud.nota_admin }}</p>
+{% endif %}
+<p>Podés enviar una nueva solicitud con los datos correctos.</p>
+<a href="{% url 'crear_solicitud' %}">Enviar nueva solicitud</a>
+{% endblock %}

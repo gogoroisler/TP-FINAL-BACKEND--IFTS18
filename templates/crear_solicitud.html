@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Solicitud de vinculación{% endblock %}
+{% block content %}
+<h1>Solicitud de vinculación</h1>
+<p>Para poder ver tus expensas necesitás indicar a qué consorcio y departamento pertenecés.</p>
+<p>El administrador revisará tu solicitud y te habilitará el acceso.</p>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Enviar solicitud</button>
+</form>
+{% endblock %}

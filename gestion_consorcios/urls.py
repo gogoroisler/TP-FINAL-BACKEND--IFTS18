@@ -2,7 +2,14 @@ from django.contrib import admin
 from django.urls import path, include
 
 from core.views import home, PanelAdminView, PanelConsorcistView
-from consorcios.views import MisExpensasView, informar_pago
+from consorcios.views import (
+    MisExpensasView,
+    informar_pago,
+    CrearSolicitudView,
+    ListarSolicitudesView,
+    gestionar_solicitud,
+    retirar_permisos,
+)
 from expensas.views import (
     ListarExpensasView,
     DetalleExpensaView,
@@ -13,7 +20,7 @@ from expensas.views import (
     PreviewPeriodoView,
     enviar_expensas,
 )
-from usuarios.views import redirigir_segun_rol
+from usuarios.views import redirigir_segun_rol, registro
 from reclamos.views import (
     CrearReclamoView,
     MisReclamosView,
@@ -25,11 +32,16 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('', home, name='home'),
+    path('registro/', registro, name='registro'),
     path('redirigir/', redirigir_segun_rol, name='redirigir_segun_rol'),
     path('panel-admin/', PanelAdminView.as_view(), name='panel_admin'),
     path('panel-consorcista/', PanelConsorcistView.as_view(), name='panel_consorcista'),
     path('mis-expensas/', MisExpensasView.as_view(), name='mis_expensas'),
     path('informar-pago/<int:expensa_id>/', informar_pago, name='informar_pago'),
+    path('solicitud/', CrearSolicitudView.as_view(), name='crear_solicitud'),
+    path('solicitudes/', ListarSolicitudesView.as_view(), name='listar_solicitudes'),
+    path('solicitudes/<int:solicitud_id>/', gestionar_solicitud, name='gestionar_solicitud'),
+    path('solicitudes/retirar/<int:solicitud_id>/', retirar_permisos, name='retirar_permisos'),
     path('listar-expensas/', ListarExpensasView.as_view(), name='listar_expensas'),
     path('expensa/<int:expensa_id>/', DetalleExpensaView.as_view(), name='detalle_expensa'),
     path('crear-expensa/', CrearExpensaView.as_view(), name='crear_expensa'),

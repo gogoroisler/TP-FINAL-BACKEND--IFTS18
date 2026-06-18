@@ -4,6 +4,11 @@
 <h1>Panel Administrador</h1>
 <p>Bienvenido, {{ user.username }}</p>
 
+<h2>Solicitudes de vinculación</h2>
+<ul>
+    <li><a href="{% url 'listar_solicitudes' %}">Ver solicitudes pendientes</a></li>
+</ul>
+
 <h2>Expensas</h2>
 <ul>
     <li><a href="{% url 'seleccionar_preview' %}">Generar expensas del período</a></li>

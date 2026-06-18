@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Solicitud pendiente{% endblock %}
+{% block content %}
+<h1>Solicitud pendiente</h1>
+<p>Tu solicitud de vinculación está siendo revisada por el administrador.</p>
+<p><strong>Consorcio:</strong> {{ solicitud.consorcio }}</p>
+<p><strong>Departamento:</strong> {{ solicitud.departamento }}</p>
+<p>Te avisaremos cuando sea aprobada.</p>
+{% endblock %}
