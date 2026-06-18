@@ -34,6 +34,8 @@ git add . && git commit -m "mensaje" && git push tpfinal borrador
 | Aprobación / rechazo de solicitudes | OK |
 | Reenvío de solicitud tras rechazo | OK |
 | Retirar permisos (cierra Titularidad activa) | OK |
+| Retirar permisos con selector cuando hay múltiples titulares | OK |
+| Validación de titulares duplicados por departamento | OK |
 | Paneles admin y consorcista con links | OK |
 | CRUD expensas | OK |
 | Gastos ordinarios y extraordinarios por proveedor | OK |
@@ -64,7 +66,9 @@ git add . && git commit -m "mensaje" && git push tpfinal borrador
 - consorcios/selectors.py -> get_departamento_por_usuario, get_titularidad_activa,
                              get_departamento_por_titularidad, get_titular_en_periodo,
                              get_solicitud_por_usuario, get_todas_las_solicitudes,
-                             get_solicitudes_pendientes
+                             get_solicitudes_pendientes,
+                             get_titularidad_activa_por_departamento,
+                             get_titularidades_activas_por_departamento
 - expensas/selectors.py   -> get_todas_las_expensas, get_expensas_por_departamento,
                              get_expensa_por_id, get_gastos_por_consorcio_periodo,
                              calcular_monto_departamento, generar_preview_periodo,
@@ -105,6 +109,8 @@ git add . && git commit -m "mensaje" && git push tpfinal borrador
 /mis-avisos/                           -> MisAvisosView
 
 ## Pendientes
-- [ ] Validacion: limite de usuarios vinculados por departamento
-- [ ] CSS y mejoras visuales
+- [ ] CSS con Bootstrap
 - [ ] README actualizado con nuevas funcionalidades
+
+## Mejoras futuras
+- [ ] Página separada de confirmación para conflicto de titulares (UX mejorada)
