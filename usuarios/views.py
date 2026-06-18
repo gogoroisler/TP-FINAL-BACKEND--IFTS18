@@ -11,5 +11,5 @@ def redirigir_segun_rol(request):
     if perfil.rol == 'admin':
         return redirect('panel_admin')
     if perfil.rol == 'consorcista':
-        return redirect('mis_expensas')
+        return redirect('panel_consorcista')
     return redirect('home')

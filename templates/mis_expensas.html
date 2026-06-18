@@ -2,6 +2,7 @@
 {% block title %}Mis Expensas{% endblock %}
 {% block content %}
 <h1>Mis Expensas</h1>
+<a href="{% url 'panel_consorcista' %}">← Volver al panel</a>
 
 {% if departamento %}
 <p><strong>Consorcio:</strong> {{ departamento.consorcio }}</p>

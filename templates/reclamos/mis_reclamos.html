@@ -2,6 +2,8 @@
 {% block title %}Mis Reclamos{% endblock %}
 {% block content %}
 <h1>Mis Reclamos</h1>
+<a href="{% url 'panel_consorcista' %}">← Volver al panel</a>
+<br><br>
 <a href="{% url 'crear_reclamo' %}">Nuevo reclamo</a>
 
 {% if reclamos %}
