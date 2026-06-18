@@ -7,6 +7,8 @@ from django.urls import reverse_lazy
 
 from consorcios.models import Consorcio, Titularidad, SolicitudVinculacion
 from consorcios.selectors import (
+    get_titularidad_activa_por_departamento,
+    get_titularidades_activas_por_departamento,
     get_departamento_por_titularidad,
     get_departamento_por_usuario,
     get_solicitud_por_usuario,
@@ -125,6 +127,41 @@ def gestionar_solicitud(request, solicitud_id):
         accion = request.POST.get('accion')
         nota_admin = request.POST.get('nota_admin', '')
         if accion == 'aprobar':
+            titular_activo = get_titularidad_activa_por_departamento(solicitud.departamento)
+            if titular_activo:
+                # Hay conflicto: mostrar aviso en la lista
+                solicitudes = get_todas_las_solicitudes()
+                return render(request, 'listar_solicitudes.html', {
+                    'solicitudes': solicitudes,
+                    'conflicto_solicitud_id': solicitud.id,
+                    'titular_activo': titular_activo,
+                    'nota_admin': nota_admin,
+                })
+            # Sin conflicto: aprobar directamente
+            solicitud.estado = 'aprobada'
+            solicitud.nota_admin = nota_admin
+            solicitud.save()
+            Titularidad.objects.create(
+                departamento=solicitud.departamento,
+                usuario=solicitud.usuario,
+                fecha_desde=timezone.now().date(),
+            )
+        elif accion == 'aprobar_reemplazar':
+            # Cierra titularidad anterior y crea la nueva
+            Titularidad.objects.filter(
+                departamento=solicitud.departamento,
+                fecha_hasta__isnull=True
+            ).update(fecha_hasta=timezone.now().date())
+            solicitud.estado = 'aprobada'
+            solicitud.nota_admin = nota_admin
+            solicitud.save()
+            Titularidad.objects.create(
+                departamento=solicitud.departamento,
+                usuario=solicitud.usuario,
+                fecha_desde=timezone.now().date(),
+            )
+        elif accion == 'aprobar_agregar':
+            # Mantiene titular anterior y agrega el nuevo
             solicitud.estado = 'aprobada'
             solicitud.nota_admin = nota_admin
             solicitud.save()
@@ -149,14 +186,25 @@ def retirar_permisos(request, solicitud_id):
         return render(request, 'sin_permiso.html')
     solicitud = get_object_or_404(SolicitudVinculacion, id=solicitud_id)
     if request.method == 'POST':
-        # Cierra la titularidad activa
-        Titularidad.objects.filter(
-            usuario=solicitud.usuario,
-            departamento=solicitud.departamento,
-            fecha_hasta__isnull=True
-        ).update(fecha_hasta=timezone.now().date())
-        # Marca la solicitud como rechazada
-        solicitud.estado = 'rechazada'
-        solicitud.nota_admin = request.POST.get('nota_admin', 'Permisos retirados por el administrador')
-        solicitud.save()
+        nota_admin = request.POST.get('nota_admin', 'Permisos retirados por el administrador')
+        titularidad_id = request.POST.get('titularidad_id')
+        if titularidad_id:
+            # Retira permisos solo al titular seleccionado
+            Titularidad.objects.filter(
+                id=titularidad_id,
+                fecha_hasta__isnull=True
+            ).update(fecha_hasta=timezone.now().date())
+        else:
+            # Cierra todas las titularidades activas del depto
+            Titularidad.objects.filter(
+                usuario=solicitud.usuario,
+                departamento=solicitud.departamento,
+                fecha_hasta__isnull=True
+            ).update(fecha_hasta=timezone.now().date())
+        # Verifica si quedan titularidades activas en el depto
+        titularidades_restantes = get_titularidades_activas_por_departamento(solicitud.departamento)
+        if not titularidades_restantes.exists():
+            solicitud.estado = 'rechazada'
+            solicitud.nota_admin = nota_admin
+            solicitud.save()
     return redirect('listar_solicitudes')

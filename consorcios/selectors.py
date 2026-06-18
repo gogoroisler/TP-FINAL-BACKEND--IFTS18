@@ -44,3 +44,15 @@ def get_solicitudes_pendientes():
     return SolicitudVinculacion.objects.filter(
         estado='pendiente'
     ).order_by('-fecha')
+
+def get_titularidad_activa_por_departamento(departamento):
+    return Titularidad.objects.filter(
+        departamento=departamento,
+        fecha_hasta__isnull=True
+    ).first()
+
+def get_titularidades_activas_por_departamento(departamento):
+    return Titularidad.objects.filter(
+        departamento=departamento,
+        fecha_hasta__isnull=True
+    )

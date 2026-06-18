@@ -23,21 +23,44 @@
         <td>{{ solicitud.fecha|date:"d/m/Y" }}</td>
         <td>
             {% if solicitud.estado == 'pendiente' %}
-            <form method="post" action="{% url 'gestionar_solicitud' solicitud.id %}">
-                {% csrf_token %}
-                <input type="text" name="nota_admin" placeholder="Nota (opcional)">
-                <button type="submit" name="accion" value="aprobar">Aprobar</button>
-                <button type="submit" name="accion" value="rechazar">Rechazar</button>
-            </form>
+                {% if conflicto_solicitud_id == solicitud.id %}
+                    <p><strong>⚠️ Este departamento ya tiene un titular activo: {{ titular_activo.usuario }}</strong></p>
+                    <p>¿Qué querés hacer?</p>
+                    <form method="post" action="{% url 'gestionar_solicitud' solicitud.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="nota_admin" value="{{ nota_admin }}">
+                        <button type="submit" name="accion" value="aprobar_reemplazar">Reemplazar titular</button>
+                        <button type="submit" name="accion" value="aprobar_agregar">Agregar como titular adicional</button>
+                        <a href="{% url 'listar_solicitudes' %}">Cancelar</a>
+                    </form>
+                {% else %}
+                    <form method="post" action="{% url 'gestionar_solicitud' solicitud.id %}">
+                        {% csrf_token %}
+                        <input type="text" name="nota_admin" placeholder="Nota (opcional)">
+                        <button type="submit" name="accion" value="aprobar">Aprobar</button>
+                        <button type="submit" name="accion" value="rechazar">Rechazar</button>
+                    </form>
+                {% endif %}
             {% elif solicitud.estado == 'aprobada' %}
-            <form method="post" action="{% url 'retirar_permisos' solicitud.id %}">
-                {% csrf_token %}
-                <input type="text" name="nota_admin" placeholder="Motivo (opcional)">
-                <button type="submit">Retirar permisos</button>
-            </form>
+                <form method="post" action="{% url 'retirar_permisos' solicitud.id %}">
+                    {% csrf_token %}
+                    <input type="text" name="nota_admin" placeholder="Motivo (opcional)">
+                    {% if solicitud.departamento.titularidad_set.count > 1 %}
+                        <br>
+                        <label>Retirar permisos a:</label>
+                        <select name="titularidad_id">
+                            {% for t in solicitud.departamento.titularidad_set.all %}
+                                {% if not t.fecha_hasta %}
+                                    <option value="{{ t.id }}">{{ t.usuario }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    {% endif %}
+                    <button type="submit">Retirar permisos</button>
+                </form>
             {% else %}
-            Rechazada
-            {% if solicitud.nota_admin %} - {{ solicitud.nota_admin }}{% endif %}
+                Rechazada
+                {% if solicitud.nota_admin %} - {{ solicitud.nota_admin }}{% endif %}
             {% endif %}
         </td>
     </tr>
