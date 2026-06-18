@@ -4,6 +4,12 @@
 ~/Escritorio/tpfinalborrador
 Rama: borrador -> sube a TP-FINAL-BACKEND--IFTS18
 
+## Comandos útiles
+cd ~/Escritorio/tpfinalborrador
+source venv/bin/activate
+python manage.py runserver
+git add . && git commit -m "mensaje" && git push tpfinal borrador
+
 ## Correcciones según devoluciones del docente
 
 | # | Corrección | Estado |
@@ -20,57 +26,85 @@ Rama: borrador -> sube a TP-FINAL-BACKEND--IFTS18
 | Funcionalidad | Estado |
 |---------------|--------|
 | Login / logout / protección de rutas | OK |
-| Roles admin / consorcista | OK |
+| Registro de usuarios desde el frontend | OK |
+| Roles admin / consorcista con RolRequeridoMixin | OK |
 | Redirect automático según rol al loguearse | OK |
 | Manejo de usuarios sin Perfil | OK |
-| CRUD expensas (admin) | OK |
-| Gastos por proveedor (GastoConsorcio) | OK |
-| Gastos ordinarios y extraordinarios | OK |
+| Solicitud de vinculación consorcista → admin | OK |
+| Aprobación / rechazo de solicitudes | OK |
+| Reenvío de solicitud tras rechazo | OK |
+| Retirar permisos (cierra Titularidad activa) | OK |
+| Paneles admin y consorcista con links | OK |
+| CRUD expensas | OK |
+| Gastos ordinarios y extraordinarios por proveedor | OK |
 | Prorrateo proporcional / igualitario por m2 | OK |
-| Validación de formato YYYY-MM en período | OK |
+| Validación formato YYYY-MM en período | OK |
 | Cálculo automático de expensa por departamento | OK |
-| Selector de consorcio y período para generar expensas | OK |
+| Selector de consorcio y período para generar | OK |
 | Vista previa antes de enviar expensas | OK |
 | Envío de expensas a consorcistas | OK |
-| Mis expensas (vista consorcista) | OK |
+| Mis expensas (consorcista) | OK |
+| Historial de pagos con fecha, monto y nota | OK |
 | Informar pago | OK |
 | Histórico de titularidad por departamento | OK |
-| Panel admin con links a funcionalidades | OK |
-| Panel consorcista con links a funcionalidades | OK |
-| RolRequeridoMixin reutilizable | OK |
+| Módulo de reclamos con estados | OK |
+| Actualizar estado de reclamos (admin) | OK |
+| Módulo de avisos (admin crea, consorcista ve) | OK |
+| Desactivar avisos | OK |
 
-## Estructura de modelos
-- consorcios/models.py -> Consorcio, Departamento, Titularidad
-- expensas/models.py   -> Proveedor, GastoConsorcio, Expensa
-- usuarios/models.py   -> Perfil (roles: admin / consorcista)
-- core/models.py       -> vacio
+## Apps del proyecto
+- core/        -> home, PanelAdminView, PanelConsorcistView
+- consorcios/  -> Consorcio, Departamento, Titularidad, SolicitudVinculacion
+- expensas/    -> Proveedor, GastoConsorcio, Expensa, Pago
+- usuarios/    -> Perfil, RolRequeridoMixin, redirigir_segun_rol, registro
+- reclamos/    -> Reclamo
+- avisos/      -> Aviso
 
 ## Estructura de selectors
-- consorcios/selectors.py -> get_departamento_por_usuario, get_titularidad_activa, get_departamento_por_titularidad, get_titular_en_periodo
-- expensas/selectors.py   -> get_todas_las_expensas, get_expensas_por_departamento, get_expensa_por_id, get_gastos_por_consorcio_periodo, calcular_monto_departamento, generar_preview_periodo, get_resumen_gastos_periodo
+- consorcios/selectors.py -> get_departamento_por_usuario, get_titularidad_activa,
+                             get_departamento_por_titularidad, get_titular_en_periodo,
+                             get_solicitud_por_usuario, get_todas_las_solicitudes,
+                             get_solicitudes_pendientes
+- expensas/selectors.py   -> get_todas_las_expensas, get_expensas_por_departamento,
+                             get_expensa_por_id, get_gastos_por_consorcio_periodo,
+                             calcular_monto_departamento, generar_preview_periodo,
+                             get_resumen_gastos_periodo, get_pagos_por_expensa
 - usuarios/selectors.py   -> get_perfil_por_usuario
+- reclamos/selectors.py   -> get_reclamos_por_usuario, get_todos_los_reclamos,
+                             get_reclamo_por_id
+- avisos/selectors.py     -> get_avisos_activos_por_consorcio,
+                             get_todos_los_avisos_por_consorcio, get_todos_los_avisos
 
-## Estructura de vistas (CBV)
-- core/views.py       -> home, PanelAdminView, PanelConsorcistView
-- consorcios/views.py -> MisExpensasView, informar_pago
-- expensas/views.py   -> ListarExpensasView, DetalleExpensaView, CrearExpensaView, EditarExpensaView, EliminarExpensaView, SeleccionarPreviewView, PreviewPeriodoView, enviar_expensas
-- usuarios/views.py   -> redirigir_segun_rol
-- usuarios/mixins.py  -> RolRequeridoMixin
-
-## URLs
-- gestion_consorcios/urls.py -> todas las rutas apuntan a sus CBV
-- LOGIN_REDIRECT_URL -> /redirigir/ (redirect automatico segun rol)
+## URLs disponibles
+/                                      -> home
+/registro/                             -> registro de usuarios
+/redirigir/                            -> redirect segun rol
+/panel-admin/                          -> PanelAdminView
+/panel-consorcista/                    -> PanelConsorcistView
+/mis-expensas/                         -> MisExpensasView
+/informar-pago/<id>/                   -> informar_pago
+/solicitud/                            -> CrearSolicitudView
+/solicitudes/                          -> ListarSolicitudesView
+/solicitudes/<id>/                     -> gestionar_solicitud
+/solicitudes/retirar/<id>/             -> retirar_permisos
+/listar-expensas/                      -> ListarExpensasView
+/expensa/<id>/                         -> DetalleExpensaView
+/crear-expensa/                        -> CrearExpensaView
+/editar-expensa/<id>/                  -> EditarExpensaView
+/eliminar-expensa/<id>/                -> EliminarExpensaView
+/generar-expensas/                     -> SeleccionarPreviewView
+/preview/<consorcio_id>/<periodo>/     -> PreviewPeriodoView
+/enviar-expensas/<consorcio_id>/<periodo>/ -> enviar_expensas
+/mis-reclamos/                         -> MisReclamosView
+/crear-reclamo/                        -> CrearReclamoView
+/reclamos/                             -> ListarReclamosView
+/reclamos/actualizar/<id>/             -> actualizar_estado
+/avisos/                               -> ListarAvisosAdminView
+/avisos/nuevo/                         -> CrearAvisoView
+/avisos/editar/<id>/                   -> EditarAvisoView
+/mis-avisos/                           -> MisAvisosView
 
 ## Pendientes
-
-### Media prioridad
-- [ ] Registro de usuarios desde el frontend
-
-### Consideraciones MVP
-- [ ] Historial de pagos (fecha y monto, no solo booleano)
-- [ ] Módulo de reclamos (mencionado en README)
-- [ ] Avisos/novedades del admin al consorcio
-
-### Después del CSS
-- [ ] Mejorar templates con estilos
+- [ ] Validacion: limite de usuarios vinculados por departamento
+- [ ] CSS y mejoras visuales
 - [ ] README actualizado con nuevas funcionalidades
