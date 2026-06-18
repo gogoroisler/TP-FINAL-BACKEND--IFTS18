@@ -27,6 +27,12 @@ from reclamos.views import (
     ListarReclamosView,
     actualizar_estado,
 )
+from avisos.views import (
+    ListarAvisosAdminView,
+    CrearAvisoView,
+    EditarAvisoView,
+    MisAvisosView,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -46,7 +52,7 @@ urlpatterns = [
     path('expensa/<int:expensa_id>/', DetalleExpensaView.as_view(), name='detalle_expensa'),
     path('crear-expensa/', CrearExpensaView.as_view(), name='crear_expensa'),
     path('editar-expensa/<int:expensa_id>/', EditarExpensaView.as_view(), name='editar_expensa'),
-    path('eliminar-expensa/<int:expensa_id>/', EliminarExpensaView.as_view(), name='eliminar_expensa'),
+    path('eliminar-expensa/<int:expensa_id>/', EliminarExpensaView.as_view(), name='eliminar_expensas'),
     path('generar-expensas/', SeleccionarPreviewView.as_view(), name='seleccionar_preview'),
     path('preview/<int:consorcio_id>/<str:periodo>/', PreviewPeriodoView.as_view(), name='preview_periodo'),
     path('enviar-expensas/<int:consorcio_id>/<str:periodo>/', enviar_expensas, name='enviar_expensas'),
@@ -54,4 +60,8 @@ urlpatterns = [
     path('crear-reclamo/', CrearReclamoView.as_view(), name='crear_reclamo'),
     path('reclamos/', ListarReclamosView.as_view(), name='listar_reclamos'),
     path('reclamos/actualizar/<int:reclamo_id>/', actualizar_estado, name='actualizar_estado'),
+    path('avisos/', ListarAvisosAdminView.as_view(), name='listar_avisos_admin'),
+    path('avisos/nuevo/', CrearAvisoView.as_view(), name='crear_aviso'),
+    path('avisos/editar/<int:aviso_id>/', EditarAvisoView.as_view(), name='editar_aviso'),
+    path('mis-avisos/', MisAvisosView.as_view(), name='mis_avisos'),
 ]

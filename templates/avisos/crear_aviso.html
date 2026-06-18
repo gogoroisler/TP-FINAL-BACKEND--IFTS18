@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Nuevo aviso{% endblock %}
+{% block content %}
+<h1>Nuevo aviso</h1>
+<a href="{% url 'listar_avisos_admin' %}">← Volver a avisos</a>
+<br><br>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Publicar aviso</button>
+</form>
+{% endblock %}

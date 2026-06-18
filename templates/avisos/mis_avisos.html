@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Avisos{% endblock %}
+{% block content %}
+<h1>Avisos del consorcio</h1>
+<a href="{% url 'panel_consorcista' %}">← Volver al panel</a>
+<br><br>
+{% if avisos %}
+{% for aviso in avisos %}
+<h2>{{ aviso.titulo }}</h2>
+<p>{{ aviso.contenido }}</p>
+<p><small>{{ aviso.fecha|date:"d/m/Y" }}</small></p>
+<hr>
+{% endfor %}
+{% else %}
+<p>No hay avisos activos para tu consorcio.</p>
+{% endif %}
+{% endblock %}

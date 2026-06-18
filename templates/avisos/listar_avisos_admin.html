@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Avisos{% endblock %}
+{% block content %}
+<h1>Avisos del consorcio</h1>
+<a href="{% url 'panel_admin' %}">← Volver al panel</a>
+<br><br>
+<a href="{% url 'crear_aviso' %}">Nuevo aviso</a>
+<br><br>
+{% if avisos %}
+<table border="1">
+    <tr>
+        <th>Consorcio</th>
+        <th>Titulo</th>
+        <th>Contenido</th>
+        <th>Estado</th>
+        <th>Fecha</th>
+        <th>Accion</th>
+    </tr>
+    {% for aviso in avisos %}
+    <tr>
+        <td>{{ aviso.consorcio }}</td>
+        <td>{{ aviso.titulo }}</td>
+        <td>{{ aviso.contenido }}</td>
+        <td>{% if aviso.activo %}Activo{% else %}Inactivo{% endif %}</td>
+        <td>{{ aviso.fecha|date:"d/m/Y" }}</td>
+        <td><a href="{% url 'editar_aviso' aviso.id %}">Editar</a></td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No hay avisos registrados.</p>
+{% endif %}
+{% endblock %}
