@@ -1,11 +1,27 @@
 {% extends 'base.html' %}
 {% block title %}Solicitud rechazada{% endblock %}
 {% block content %}
-<h1>Solicitud rechazada</h1>
-<p>Tu solicitud de vinculación fue rechazada por el administrador.</p>
-{% if solicitud.nota_admin %}
-<p><strong>Motivo:</strong> {{ solicitud.nota_admin }}</p>
-{% endif %}
-<p>Podés enviar una nueva solicitud con los datos correctos.</p>
-<a href="{% url 'crear_solicitud' %}">Enviar nueva solicitud</a>
+
+<div class="min-h-full flex items-center justify-center py-12">
+    <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-8 max-w-md text-center">
+        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </div>
+        <h1 class="text-xl font-bold text-slate-800 mb-2">Solicitud rechazada</h1>
+        <p class="text-slate-500 text-sm mb-4">Tu solicitud de vinculación fue rechazada por el administrador.</p>
+        {% if solicitud.nota_admin %}
+        <div class="bg-red-50 border border-red-200 rounded-md p-3 mb-4 text-left">
+            <p class="text-sm text-red-700"><span class="font-medium">Motivo:</span> {{ solicitud.nota_admin }}</p>
+        </div>
+        {% endif %}
+        <p class="text-slate-500 text-sm mb-6">Podés enviar una nueva solicitud con los datos correctos.</p>
+        <a href="{% url 'crear_solicitud' %}"
+           class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md font-medium transition-colors text-sm">
+            Enviar nueva solicitud
+        </a>
+    </div>
+</div>
+
 {% endblock %}

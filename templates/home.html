@@ -1,16 +1,20 @@
-<!-- Página principal del sistema -->
 {% extends 'base.html' %}
-
 {% block title %}Inicio{% endblock %}
-
 {% block content %}
 
-<h1>Bienvenido al Sistema de Expensas</h1>
-
-{% if user.is_authenticated %}
-    <p>Sesión iniciada como {{ user.username }}</p>
-{% else %}
-    <p>No has iniciado sesión</p>
-{% endif %}
+<div class="min-h-full flex items-center justify-center py-12">
+    <div class="text-center">
+        <h1 class="text-2xl font-bold text-slate-800 mb-2">Bienvenido al Sistema de Gestión de Consorcios</h1>
+        {% if user.is_authenticated %}
+            <p class="text-slate-500 text-sm">Sesión iniciada como <span class="font-medium">{{ user.username }}</span></p>
+        {% else %}
+            <p class="text-slate-500 text-sm mb-4">No has iniciado sesión.</p>
+            <a href="{% url 'login' %}"
+               class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md font-medium transition-colors text-sm">
+                Iniciar sesión
+            </a>
+        {% endif %}
+    </div>
+</div>
 
 {% endblock %}

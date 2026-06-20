@@ -1,18 +1,37 @@
 {% extends 'base.html' %}
 {% block title %}Generar Expensas{% endblock %}
 {% block content %}
-<h1>Generar Expensas</h1>
-<form method="get" action="">
-    <label>Consorcio:</label>
-    <select name="consorcio_id">
-        {% for consorcio in consorcios %}
-        <option value="{{ consorcio.id }}">{{ consorcio.nombre }}</option>
-        {% endfor %}
-    </select>
-    <br><br>
-    <label>Periodo (YYYY-MM):</label>
-    <input type="text" name="periodo" placeholder="2026-06" maxlength="7">
-    <br><br>
-    <button type="submit">Ver preview</button>
-</form>
+
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-800">Generar Expensas</h1>
+    <p class="text-slate-500 mt-1">Seleccioná el consorcio y el período para previsualizar las expensas.</p>
+</div>
+
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm p-6 max-w-md">
+    <form method="get" action="">
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Consorcio</label>
+                <select name="consorcio_id"
+                        class="border border-slate-300 rounded-md px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    {% for consorcio in consorcios %}
+                    <option value="{{ consorcio.id }}">{{ consorcio.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Período (YYYY-MM)</label>
+                <input type="text" name="periodo" placeholder="2026-06" maxlength="7"
+                       class="border border-slate-300 rounded-md px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+            </div>
+        </div>
+        <div class="mt-6">
+            <button type="submit"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md font-medium transition-colors text-sm">
+                Ver preview
+            </button>
+        </div>
+    </form>
+</div>
+
 {% endblock %}

@@ -1,37 +1,77 @@
 {% extends 'base.html' %}
 {% block title %}Detalle Expensa{% endblock %}
 {% block content %}
-<h1>Detalle de Expensa</h1>
-<p><strong>Departamento:</strong> {{ expensa.departamento }}</p>
-<p><strong>Periodo:</strong> {{ expensa.periodo }}</p>
-<p><strong>Vencimiento:</strong> {{ expensa.fecha_vencimiento }}</p>
-<p><strong>Estado:</strong> {% if expensa.pagada %}Pagada{% else %}Pendiente{% endif %}</p>
 
-<h2>Desglose por proveedor</h2>
+<div class="mb-6 flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-slate-800">Detalle de Expensa</h1>
+    <a href="{% url 'listar_expensas' %}"
+       class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-4 py-2 rounded-md font-medium transition-colors text-sm">
+        ← Volver al listado
+    </a>
+</div>
+
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm p-6 mb-6 max-w-2xl">
+    <dl class="grid grid-cols-2 gap-4">
+        <div>
+            <dt class="text-xs font-medium text-slate-500 uppercase tracking-wider">Departamento</dt>
+            <dd class="mt-1 text-sm text-slate-800 font-medium">{{ expensa.departamento }}</dd>
+        </div>
+        <div>
+            <dt class="text-xs font-medium text-slate-500 uppercase tracking-wider">Período</dt>
+            <dd class="mt-1 text-sm text-slate-800 font-medium">{{ expensa.periodo }}</dd>
+        </div>
+        <div>
+            <dt class="text-xs font-medium text-slate-500 uppercase tracking-wider">Vencimiento</dt>
+            <dd class="mt-1 text-sm text-slate-800 font-medium">{{ expensa.fecha_vencimiento }}</dd>
+        </div>
+        <div>
+            <dt class="text-xs font-medium text-slate-500 uppercase tracking-wider">Estado</dt>
+            <dd class="mt-1">
+                {% if expensa.pagada %}
+                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Pagada</span>
+                {% else %}
+                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">Pendiente</span>
+                {% endif %}
+            </dd>
+        </div>
+    </dl>
+</div>
+
+<h2 class="text-lg font-semibold text-slate-800 mb-3">Desglose por proveedor</h2>
+
 {% if items %}
-<table border="1">
-    <tr>
-        <th>Proveedor</th>
-        <th>Rubro</th>
-        <th>Descripcion</th>
-        <th>Monto</th>
-    </tr>
-    {% for item in items %}
-    <tr>
-        <td>{{ item.proveedor.nombre }}</td>
-        <td>{{ item.proveedor.rubro }}</td>
-        <td>{{ item.descripcion }}</td>
-        <td>${{ item.monto }}</td>
-    </tr>
-    {% endfor %}
-    <tr>
-        <td colspan="3"><strong>Total</strong></td>
-        <td><strong>${{ expensa.monto }}</strong></td>
-    </tr>
-</table>
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden max-w-2xl">
+    <table class="w-full">
+        <thead class="bg-slate-50 border-b border-slate-200">
+            <tr>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Proveedor</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Rubro</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Descripción</th>
+                <th class="text-right px-4 py-3 text-sm font-medium text-slate-500">Monto</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+            {% for item in items %}
+            <tr class="hover:bg-slate-50">
+                <td class="px-4 py-3 text-sm text-slate-800">{{ item.proveedor.nombre }}</td>
+                <td class="px-4 py-3 text-sm text-slate-500">{{ item.proveedor.rubro }}</td>
+                <td class="px-4 py-3 text-sm text-slate-500">{{ item.descripcion }}</td>
+                <td class="px-4 py-3 text-sm text-slate-800 text-right">${{ item.monto }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot class="bg-slate-50 border-t border-slate-200">
+            <tr>
+                <td colspan="3" class="px-4 py-3 text-sm font-semibold text-slate-800">Total</td>
+                <td class="px-4 py-3 text-sm font-semibold text-slate-800 text-right">${{ expensa.monto }}</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
 {% else %}
-<p>Esta expensa no tiene items cargados todavia.</p>
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm p-8 text-center max-w-2xl">
+    <p class="text-slate-500 text-sm">Esta expensa no tiene ítems cargados todavía.</p>
+</div>
 {% endif %}
 
-<a href="{% url 'listar_expensas' %}">Volver al listado</a>
 {% endblock %}

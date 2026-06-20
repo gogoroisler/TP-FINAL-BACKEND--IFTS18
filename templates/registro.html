@@ -1,11 +1,54 @@
 {% extends 'base.html' %}
-{% block title %}Registro{% endblock %}
+{% block title %}Crear cuenta{% endblock %}
 {% block content %}
-<h1>Crear cuenta</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Registrarse</button>
-</form>
-<p>¿Ya tenés cuenta? <a href="{% url 'login' %}">Iniciá sesión</a></p>
+
+<div class="min-h-full flex items-center justify-center py-12">
+    <div class="w-full max-w-sm">
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-slate-800">Sistema de Gestión<br>de Consorcios</h1>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-8">
+            <h2 class="text-lg font-semibold text-slate-800 mb-6">Crear cuenta</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="space-y-4">
+                    {% for field in form %}
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <p class="text-slate-400 text-xs mt-1">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <p class="text-red-600 text-xs mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="submit"
+                        class="mt-6 w-full bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md font-medium transition-colors text-sm">
+                    Registrarse
+                </button>
+            </form>
+            <p class="text-center text-sm text-slate-500 mt-4">
+                ¿Ya tenés cuenta?
+                <a href="{% url 'login' %}" class="text-emerald-600 hover:text-emerald-700 font-medium">Iniciá sesión</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    #content input, #content select {
+        border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 12px; width: 100%;
+        font-size: 14px; outline: none;
+    }
+    #content input:focus, #content select:focus {
+        border-color: #10b981; box-shadow: 0 0 0 2px rgba(16,185,129,0.2);
+    }
+</style>
+
 {% endblock %}

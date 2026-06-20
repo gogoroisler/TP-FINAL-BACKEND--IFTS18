@@ -1,33 +1,61 @@
 {% extends 'base.html' %}
 {% block title %}Avisos{% endblock %}
 {% block content %}
-<h1>Avisos del consorcio</h1>
-<a href="{% url 'panel_admin' %}">← Volver al panel</a>
-<br><br>
-<a href="{% url 'crear_aviso' %}">Nuevo aviso</a>
-<br><br>
+
+<div class="mb-6 flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-slate-800">Avisos del consorcio</h1>
+    <div class="flex gap-2">
+        <a href="{% url 'crear_aviso' %}"
+           class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md font-medium transition-colors text-sm">
+            + Nuevo aviso
+        </a>
+        <a href="{% url 'panel_admin' %}"
+           class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-4 py-2 rounded-md font-medium transition-colors text-sm">
+            ← Volver al panel
+        </a>
+    </div>
+</div>
+
 {% if avisos %}
-<table border="1">
-    <tr>
-        <th>Consorcio</th>
-        <th>Titulo</th>
-        <th>Contenido</th>
-        <th>Estado</th>
-        <th>Fecha</th>
-        <th>Accion</th>
-    </tr>
-    {% for aviso in avisos %}
-    <tr>
-        <td>{{ aviso.consorcio }}</td>
-        <td>{{ aviso.titulo }}</td>
-        <td>{{ aviso.contenido }}</td>
-        <td>{% if aviso.activo %}Activo{% else %}Inactivo{% endif %}</td>
-        <td>{{ aviso.fecha|date:"d/m/Y" }}</td>
-        <td><a href="{% url 'editar_aviso' aviso.id %}">Editar</a></td>
-    </tr>
-    {% endfor %}
-</table>
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-slate-50 border-b border-slate-200">
+            <tr>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Consorcio</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Título</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Contenido</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Estado</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Fecha</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Acción</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+            {% for aviso in avisos %}
+            <tr class="hover:bg-slate-50">
+                <td class="px-4 py-3 text-sm text-slate-800">{{ aviso.consorcio }}</td>
+                <td class="px-4 py-3 text-sm text-slate-800 font-medium">{{ aviso.titulo }}</td>
+                <td class="px-4 py-3 text-sm text-slate-500 max-w-xs">{{ aviso.contenido }}</td>
+                <td class="px-4 py-3">
+                    {% if aviso.activo %}
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Activo</span>
+                    {% else %}
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-500">Inactivo</span>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-500">{{ aviso.fecha|date:"d/m/Y" }}</td>
+                <td class="px-4 py-3">
+                    <a href="{% url 'editar_aviso' aviso.id %}"
+                       class="text-sm text-emerald-600 hover:text-emerald-700 font-medium">Editar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% else %}
-<p>No hay avisos registrados.</p>
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm p-12 text-center">
+    <p class="text-slate-500">No hay avisos registrados.</p>
+</div>
 {% endif %}
+
 {% endblock %}

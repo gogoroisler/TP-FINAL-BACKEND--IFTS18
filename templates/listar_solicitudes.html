@@ -1,72 +1,121 @@
 {% extends 'base.html' %}
 {% block title %}Solicitudes de vinculación{% endblock %}
 {% block content %}
-<h1>Solicitudes de vinculación</h1>
-<a href="{% url 'panel_admin' %}">← Volver al panel</a>
-<br><br>
+
+<div class="mb-6 flex items-center justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Solicitudes de vinculación</h1>
+    </div>
+    <a href="{% url 'panel_admin' %}"
+       class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-4 py-2 rounded-md font-medium transition-colors text-sm">
+        ← Volver al panel
+    </a>
+</div>
+
 {% if solicitudes %}
-<table border="1">
-    <tr>
-        <th>Usuario</th>
-        <th>Consorcio</th>
-        <th>Departamento</th>
-        <th>Estado</th>
-        <th>Fecha</th>
-        <th>Accion</th>
-    </tr>
-    {% for solicitud in solicitudes %}
-    <tr>
-        <td>{{ solicitud.usuario }}</td>
-        <td>{{ solicitud.consorcio }}</td>
-        <td>{{ solicitud.departamento }}</td>
-        <td>{{ solicitud.get_estado_display }}</td>
-        <td>{{ solicitud.fecha|date:"d/m/Y" }}</td>
-        <td>
-            {% if solicitud.estado == 'pendiente' %}
-                {% if conflicto_solicitud_id == solicitud.id %}
-                    <p><strong>⚠️ Este departamento ya tiene un titular activo: {{ titular_activo.usuario }}</strong></p>
-                    <p>¿Qué querés hacer?</p>
-                    <form method="post" action="{% url 'gestionar_solicitud' solicitud.id %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="nota_admin" value="{{ nota_admin }}">
-                        <button type="submit" name="accion" value="aprobar_reemplazar">Reemplazar titular</button>
-                        <button type="submit" name="accion" value="aprobar_agregar">Agregar como titular adicional</button>
-                        <a href="{% url 'listar_solicitudes' %}">Cancelar</a>
-                    </form>
-                {% else %}
-                    <form method="post" action="{% url 'gestionar_solicitud' solicitud.id %}">
-                        {% csrf_token %}
-                        <input type="text" name="nota_admin" placeholder="Nota (opcional)">
-                        <button type="submit" name="accion" value="aprobar">Aprobar</button>
-                        <button type="submit" name="accion" value="rechazar">Rechazar</button>
-                    </form>
-                {% endif %}
-            {% elif solicitud.estado == 'aprobada' %}
-                <form method="post" action="{% url 'retirar_permisos' solicitud.id %}">
-                    {% csrf_token %}
-                    <input type="text" name="nota_admin" placeholder="Motivo (opcional)">
-                    {% if solicitud.departamento.titularidad_set.count > 1 %}
-                        <br>
-                        <label>Retirar permisos a:</label>
-                        <select name="titularidad_id">
-                            {% for t in solicitud.departamento.titularidad_set.all %}
-                                {% if not t.fecha_hasta %}
-                                    <option value="{{ t.id }}">{{ t.usuario }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-slate-50 border-b border-slate-200">
+            <tr>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Usuario</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Consorcio</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Departamento</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Estado</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Fecha</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Acción</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+            {% for solicitud in solicitudes %}
+            <tr class="hover:bg-slate-50">
+                <td class="px-4 py-3 text-sm text-slate-800">{{ solicitud.usuario }}</td>
+                <td class="px-4 py-3 text-sm text-slate-800">{{ solicitud.consorcio }}</td>
+                <td class="px-4 py-3 text-sm text-slate-800">{{ solicitud.departamento }}</td>
+                <td class="px-4 py-3">
+                    {% if solicitud.estado == 'pendiente' %}
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">{{ solicitud.get_estado_display }}</span>
+                    {% elif solicitud.estado == 'aprobada' %}
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">{{ solicitud.get_estado_display }}</span>
+                    {% else %}
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">{{ solicitud.get_estado_display }}</span>
                     {% endif %}
-                    <button type="submit">Retirar permisos</button>
-                </form>
-            {% else %}
-                Rechazada
-                {% if solicitud.nota_admin %} - {{ solicitud.nota_admin }}{% endif %}
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-500">{{ solicitud.fecha|date:"d/m/Y" }}</td>
+                <td class="px-4 py-4">
+                    {% if solicitud.estado == 'pendiente' %}
+                        {% if conflicto_solicitud_id == solicitud.id %}
+                            <div class="bg-amber-50 border border-amber-200 rounded-md p-3 mb-3">
+                                <p class="text-sm font-medium text-amber-800">
+                                    ⚠️ Este departamento ya tiene un titular activo: <strong>{{ titular_activo.usuario }}</strong>
+                                </p>
+                                <p class="text-sm text-amber-700 mt-1">¿Qué querés hacer?</p>
+                            </div>
+                            <form method="post" action="{% url 'gestionar_solicitud' solicitud.id %}" class="flex flex-wrap gap-2">
+                                {% csrf_token %}
+                                <input type="hidden" name="nota_admin" value="{{ nota_admin }}">
+                                <button type="submit" name="accion" value="aprobar_reemplazar"
+                                        class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
+                                    Reemplazar titular
+                                </button>
+                                <button type="submit" name="accion" value="aprobar_agregar"
+                                        class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
+                                    Agregar como adicional
+                                </button>
+                                <a href="{% url 'listar_solicitudes' %}"
+                                   class="bg-white border border-slate-300 text-slate-500 hover:bg-slate-50 px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
+                                    Cancelar
+                                </a>
+                            </form>
+                        {% else %}
+                            <form method="post" action="{% url 'gestionar_solicitud' solicitud.id %}" class="flex flex-wrap items-center gap-2">
+                                {% csrf_token %}
+                                <input type="text" name="nota_admin" placeholder="Nota (opcional)"
+                                       class="border border-slate-300 rounded-md px-3 py-1.5 text-sm w-40 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                <button type="submit" name="accion" value="aprobar"
+                                        class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
+                                    Aprobar
+                                </button>
+                                <button type="submit" name="accion" value="rechazar"
+                                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
+                                    Rechazar
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% elif solicitud.estado == 'aprobada' %}
+                        <form method="post" action="{% url 'retirar_permisos' solicitud.id %}" class="flex flex-wrap items-center gap-2">
+                            {% csrf_token %}
+                            <input type="text" name="nota_admin" placeholder="Motivo (opcional)"
+                                   class="border border-slate-300 rounded-md px-3 py-1.5 text-sm w-40 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            {% if solicitud.departamento.titularidad_set.count > 1 %}
+                                <select name="titularidad_id"
+                                        class="border border-slate-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                    {% for t in solicitud.departamento.titularidad_set.all %}
+                                        {% if not t.fecha_hasta %}
+                                            <option value="{{ t.id }}">{{ t.usuario }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
+                            <button type="submit"
+                                    class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
+                                Retirar permisos
+                            </button>
+                        </form>
+                    {% else %}
+                        <span class="text-sm text-slate-500">
+                            Rechazada{% if solicitud.nota_admin %} — {{ solicitud.nota_admin }}{% endif %}
+                        </span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% else %}
-<p>No hay solicitudes registradas.</p>
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm p-12 text-center">
+    <p class="text-slate-500">No hay solicitudes registradas.</p>
+</div>
 {% endif %}
+
 {% endblock %}
