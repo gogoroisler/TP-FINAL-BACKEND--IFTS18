@@ -111,6 +111,7 @@ Las expensas se calculan automáticamente a partir de los gastos del consorcio:
 ```bash
 git clone https://github.com/gogoroisler/TP-FINAL-BACKEND--IFTS18.git
 cd TP-FINAL-BACKEND--IFTS18
+git checkout borrador
 ```
 
 ### 2. Crear y activar entorno virtual
@@ -128,8 +129,9 @@ pip install -r requirements.txt
 
 ### 4. Aplicar migraciones
 
+Las migraciones ya están incluidas en el repositorio, no hace falta correr `makemigrations`.
+
 ```bash
-python manage.py makemigrations
 python manage.py migrate
 ```
 
@@ -139,7 +141,11 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
-### 6. Ejecutar el servidor
+### 6. Asignar perfil de administrador
+
+Entrá al Django Admin (`http://127.0.0.1:8000/admin/`) con el superusuario creado y agregá un `Perfil` con rol `admin` para ese usuario. Esto es necesario para acceder al panel de administrador del sistema.
+
+### 7. Ejecutar el servidor
 
 ```bash
 python manage.py runserver
