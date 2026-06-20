@@ -16,7 +16,7 @@ Sistema web desarrollado en Django para la gestión integral de consorcios. Perm
 - Python 3.14
 - Django 6.0.6
 - SQLite3
-- HTML
+- HTML + Tailwind CSS (via CDN)
 - Git / GitHub
 
 ---
@@ -191,8 +191,6 @@ python manage.py runserver
 
 ## Mejoras futuras
 
-- Página de confirmación separada para conflictos de titularidad (UX)
-- Estilos visuales con Bootstrap
 - API REST con Django REST Framework
 
 ---
