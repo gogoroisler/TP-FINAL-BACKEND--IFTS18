@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Proveedores{% endblock %}
+{% block content %}
+
+<div class="mb-6 flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-slate-800">Proveedores</h1>
+    <a href="{% url 'crear_proveedor' %}"
+       class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md font-medium transition-colors text-sm">
+        + Nuevo proveedor
+    </a>
+</div>
+
+{% if proveedores %}
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-slate-50 border-b border-slate-200">
+            <tr>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Nombre</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">CUIT</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Rubro</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+            {% for proveedor in proveedores %}
+            <tr class="hover:bg-slate-50">
+                <td class="px-4 py-3 text-sm font-medium text-slate-800">{{ proveedor.nombre }}</td>
+                <td class="px-4 py-3 text-sm text-slate-600">{{ proveedor.cuit }}</td>
+                <td class="px-4 py-3 text-sm text-slate-600">{{ proveedor.rubro }}</td>
+                <td class="px-4 py-3 text-sm flex items-center gap-3">
+                    <a href="{% url 'editar_proveedor' proveedor.id %}" class="text-slate-600 hover:text-slate-800 font-medium">Editar</a>
+                    <a href="{% url 'eliminar_proveedor' proveedor.id %}" class="text-red-600 hover:text-red-700 font-medium">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm p-12 text-center">
+    <p class="text-slate-500">No hay proveedores registrados.</p>
+</div>
+{% endif %}
+
+{% endblock %}

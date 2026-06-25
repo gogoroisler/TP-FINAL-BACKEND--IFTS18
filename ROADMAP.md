@@ -48,3 +48,4 @@ Para que el proyecto pueda desplegarse en cualquier servidor sin depender del am
 - Flujo de vinculación con manejo de conflictos de titulares correctamente resuelto.
 - Cálculo de expensas con los 4 casos de prorrateo (ordinario/extraordinario × proporcional/igualitario).
 - Diseño con Tailwind CSS aplicado en todos los templates.
+- CRUD completo sin Django Admin: consorcios, departamentos, titularidades, proveedores, gastos, usuarios y perfiles tienen vistas propias con Tailwind.

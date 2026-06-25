@@ -56,3 +56,16 @@ def get_titularidades_activas_por_departamento(departamento):
         departamento=departamento,
         fecha_hasta__isnull=True
     )
+
+
+def get_todos_los_consorcios():
+    from .models import Consorcio
+    return Consorcio.objects.all().order_by('nombre')
+
+
+def get_todos_los_departamentos():
+    return Departamento.objects.all().order_by('consorcio', 'numero')
+
+
+def get_todas_las_titularidades():
+    return Titularidad.objects.all().select_related('departamento', 'usuario').order_by('departamento__consorcio', 'departamento__numero')

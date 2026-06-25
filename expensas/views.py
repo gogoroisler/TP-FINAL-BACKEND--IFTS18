@@ -7,12 +7,14 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView, D
 from consorcios.models import Consorcio
 from usuarios.mixins import RolRequeridoMixin
 from usuarios.selectors import get_perfil_por_usuario
-from .models import Expensa
+from .models import Expensa, Proveedor, GastoConsorcio
 from .selectors import (
     get_todas_las_expensas,
     get_gastos_por_consorcio_periodo,
     generar_preview_periodo,
     calcular_monto_departamento,
+    get_todos_los_proveedores,
+    get_todos_los_gastos,
 )
 
 
@@ -106,6 +108,84 @@ class PreviewPeriodoView(RolRequeridoMixin, TemplateView):
         context['consorcio_id'] = consorcio_id
         context['periodo'] = periodo
         return context
+
+
+@method_decorator(login_required, name='dispatch')
+class ListarProveedoresView(RolRequeridoMixin, ListView):
+    rol_requerido = 'admin'
+    model = Proveedor
+    template_name = 'proveedores/listar.html'
+    context_object_name = 'proveedores'
+
+    def get_queryset(self):
+        return get_todos_los_proveedores()
+
+
+@method_decorator(login_required, name='dispatch')
+class CrearProveedorView(RolRequeridoMixin, CreateView):
+    rol_requerido = 'admin'
+    model = Proveedor
+    template_name = 'proveedores/crear.html'
+    fields = ['nombre', 'cuit', 'rubro']
+    success_url = reverse_lazy('listar_proveedores')
+
+
+@method_decorator(login_required, name='dispatch')
+class EditarProveedorView(RolRequeridoMixin, UpdateView):
+    rol_requerido = 'admin'
+    model = Proveedor
+    template_name = 'proveedores/editar.html'
+    fields = ['nombre', 'cuit', 'rubro']
+    success_url = reverse_lazy('listar_proveedores')
+    pk_url_kwarg = 'proveedor_id'
+
+
+@method_decorator(login_required, name='dispatch')
+class EliminarProveedorView(RolRequeridoMixin, DeleteView):
+    rol_requerido = 'admin'
+    model = Proveedor
+    template_name = 'proveedores/eliminar.html'
+    success_url = reverse_lazy('listar_proveedores')
+    pk_url_kwarg = 'proveedor_id'
+
+
+@method_decorator(login_required, name='dispatch')
+class ListarGastosView(RolRequeridoMixin, ListView):
+    rol_requerido = 'admin'
+    model = GastoConsorcio
+    template_name = 'gastos/listar.html'
+    context_object_name = 'gastos'
+
+    def get_queryset(self):
+        return get_todos_los_gastos()
+
+
+@method_decorator(login_required, name='dispatch')
+class CrearGastoView(RolRequeridoMixin, CreateView):
+    rol_requerido = 'admin'
+    model = GastoConsorcio
+    template_name = 'gastos/crear.html'
+    fields = ['consorcio', 'proveedor', 'periodo', 'descripcion', 'monto', 'tipo', 'alcance', 'prorrateo', 'departamentos']
+    success_url = reverse_lazy('listar_gastos')
+
+
+@method_decorator(login_required, name='dispatch')
+class EditarGastoView(RolRequeridoMixin, UpdateView):
+    rol_requerido = 'admin'
+    model = GastoConsorcio
+    template_name = 'gastos/editar.html'
+    fields = ['consorcio', 'proveedor', 'periodo', 'descripcion', 'monto', 'tipo', 'alcance', 'prorrateo', 'departamentos']
+    success_url = reverse_lazy('listar_gastos')
+    pk_url_kwarg = 'gasto_id'
+
+
+@method_decorator(login_required, name='dispatch')
+class EliminarGastoView(RolRequeridoMixin, DeleteView):
+    rol_requerido = 'admin'
+    model = GastoConsorcio
+    template_name = 'gastos/eliminar.html'
+    success_url = reverse_lazy('listar_gastos')
+    pk_url_kwarg = 'gasto_id'
 
 
 @login_required

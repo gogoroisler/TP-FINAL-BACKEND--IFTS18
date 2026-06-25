@@ -82,7 +82,7 @@ Las expensas se calculan automáticamente a partir de los gastos del consorcio:
 
 ### Flujo de generación de expensas
 
-1. Admin carga los gastos del consorcio del período via Django Admin
+1. Admin carga los gastos del consorcio del período desde `/gastos/nuevo/`
 2. Admin ingresa a `/generar-expensas/` y selecciona consorcio y período
 3. El sistema muestra una vista previa con el monto calculado por departamento
 4. Al confirmar, se crean las expensas con `publicada=True`
@@ -143,7 +143,7 @@ python manage.py createsuperuser
 
 ### 6. Asignar perfil de administrador
 
-Entrá al Django Admin (`http://127.0.0.1:8000/admin/`) con el superusuario creado y agregá un `Perfil` con rol `admin` para ese usuario. Esto es necesario para acceder al panel de administrador del sistema.
+Entrá al Django Admin (`http://127.0.0.1:8000/admin/`) con el superusuario creado y agregá un `Perfil` con rol `admin` para ese usuario. Esto es necesario para acceder al panel de administrador del sistema por primera vez. Una vez dentro, la gestión de usuarios y perfiles se hace desde el propio sistema en `/usuarios/` y `/perfiles/`.
 
 ### 7. Ejecutar el servidor
 
@@ -168,10 +168,11 @@ python manage.py runserver
 ## Funcionalidades por rol
 
 ### Administrador
-- Gestionar consorcios, departamentos y proveedores via Django Admin
+- Gestionar consorcios, departamentos, titularidades y proveedores desde el panel
+- Gestionar usuarios y perfiles desde el panel
 - Aprobar, rechazar y gestionar solicitudes de vinculación
 - Retirar permisos a consorcistas
-- Cargar gastos del consorcio por período y proveedor
+- Cargar y gestionar gastos del consorcio por período y proveedor
 - Generar expensas con vista previa y cálculo automático
 - Ver y gestionar todas las expensas
 - Actualizar el estado de los reclamos

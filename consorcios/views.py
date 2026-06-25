@@ -2,10 +2,10 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 
-from consorcios.models import Consorcio, Titularidad, SolicitudVinculacion
+from consorcios.models import Consorcio, Departamento, Titularidad, SolicitudVinculacion
 from consorcios.selectors import (
     get_titularidad_activa_por_departamento,
     get_titularidades_activas_por_departamento,
@@ -13,6 +13,9 @@ from consorcios.selectors import (
     get_departamento_por_usuario,
     get_solicitud_por_usuario,
     get_todas_las_solicitudes,
+    get_todos_los_consorcios,
+    get_todos_los_departamentos,
+    get_todas_las_titularidades,
 )
 from expensas.models import Expensa
 from expensas.selectors import get_expensas_por_departamento, get_pagos_por_expensa
@@ -175,6 +178,123 @@ def gestionar_solicitud(request, solicitud_id):
             solicitud.nota_admin = nota_admin
             solicitud.save()
     return redirect('listar_solicitudes')
+
+
+@method_decorator(login_required, name='dispatch')
+class ListarConsorciosView(RolRequeridoMixin, ListView):
+    rol_requerido = 'admin'
+    model = Consorcio
+    template_name = 'consorcios/listar.html'
+    context_object_name = 'consorcios'
+
+    def get_queryset(self):
+        return get_todos_los_consorcios()
+
+
+@method_decorator(login_required, name='dispatch')
+class CrearConsorcioView(RolRequeridoMixin, CreateView):
+    rol_requerido = 'admin'
+    model = Consorcio
+    template_name = 'consorcios/crear.html'
+    fields = ['nombre', 'direccion', 'cuit', 'telefono', 'email']
+    success_url = reverse_lazy('listar_consorcios')
+
+
+@method_decorator(login_required, name='dispatch')
+class EditarConsorcioView(RolRequeridoMixin, UpdateView):
+    rol_requerido = 'admin'
+    model = Consorcio
+    template_name = 'consorcios/editar.html'
+    fields = ['nombre', 'direccion', 'cuit', 'telefono', 'email']
+    success_url = reverse_lazy('listar_consorcios')
+    pk_url_kwarg = 'consorcio_id'
+
+
+@method_decorator(login_required, name='dispatch')
+class EliminarConsorcioView(RolRequeridoMixin, DeleteView):
+    rol_requerido = 'admin'
+    model = Consorcio
+    template_name = 'consorcios/eliminar.html'
+    success_url = reverse_lazy('listar_consorcios')
+    pk_url_kwarg = 'consorcio_id'
+
+
+@method_decorator(login_required, name='dispatch')
+class ListarDepartamentosView(RolRequeridoMixin, ListView):
+    rol_requerido = 'admin'
+    model = Departamento
+    template_name = 'departamentos/listar.html'
+    context_object_name = 'departamentos'
+
+    def get_queryset(self):
+        return get_todos_los_departamentos()
+
+
+@method_decorator(login_required, name='dispatch')
+class CrearDepartamentoView(RolRequeridoMixin, CreateView):
+    rol_requerido = 'admin'
+    model = Departamento
+    template_name = 'departamentos/crear.html'
+    fields = ['consorcio', 'numero', 'piso', 'propietario', 'metros_cuadrados']
+    success_url = reverse_lazy('listar_departamentos')
+
+
+@method_decorator(login_required, name='dispatch')
+class EditarDepartamentoView(RolRequeridoMixin, UpdateView):
+    rol_requerido = 'admin'
+    model = Departamento
+    template_name = 'departamentos/editar.html'
+    fields = ['consorcio', 'numero', 'piso', 'propietario', 'metros_cuadrados']
+    success_url = reverse_lazy('listar_departamentos')
+    pk_url_kwarg = 'departamento_id'
+
+
+@method_decorator(login_required, name='dispatch')
+class EliminarDepartamentoView(RolRequeridoMixin, DeleteView):
+    rol_requerido = 'admin'
+    model = Departamento
+    template_name = 'departamentos/eliminar.html'
+    success_url = reverse_lazy('listar_departamentos')
+    pk_url_kwarg = 'departamento_id'
+
+
+@method_decorator(login_required, name='dispatch')
+class ListarTitularidadesView(RolRequeridoMixin, ListView):
+    rol_requerido = 'admin'
+    model = Titularidad
+    template_name = 'titularidades/listar.html'
+    context_object_name = 'titularidades'
+
+    def get_queryset(self):
+        return get_todas_las_titularidades()
+
+
+@method_decorator(login_required, name='dispatch')
+class CrearTitularidadView(RolRequeridoMixin, CreateView):
+    rol_requerido = 'admin'
+    model = Titularidad
+    template_name = 'titularidades/crear.html'
+    fields = ['departamento', 'usuario', 'fecha_desde', 'fecha_hasta']
+    success_url = reverse_lazy('listar_titularidades')
+
+
+@method_decorator(login_required, name='dispatch')
+class EditarTitularidadView(RolRequeridoMixin, UpdateView):
+    rol_requerido = 'admin'
+    model = Titularidad
+    template_name = 'titularidades/editar.html'
+    fields = ['departamento', 'usuario', 'fecha_desde', 'fecha_hasta']
+    success_url = reverse_lazy('listar_titularidades')
+    pk_url_kwarg = 'titularidad_id'
+
+
+@method_decorator(login_required, name='dispatch')
+class EliminarTitularidadView(RolRequeridoMixin, DeleteView):
+    rol_requerido = 'admin'
+    model = Titularidad
+    template_name = 'titularidades/eliminar.html'
+    success_url = reverse_lazy('listar_titularidades')
+    pk_url_kwarg = 'titularidad_id'
 
 
 @login_required

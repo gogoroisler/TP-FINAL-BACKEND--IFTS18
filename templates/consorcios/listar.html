@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Consorcios{% endblock %}
+{% block content %}
+
+<div class="mb-6 flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-slate-800">Consorcios</h1>
+    <a href="{% url 'crear_consorcio' %}"
+       class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md font-medium transition-colors text-sm">
+        + Nuevo consorcio
+    </a>
+</div>
+
+{% if consorcios %}
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-slate-50 border-b border-slate-200">
+            <tr>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Nombre</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Dirección</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">CUIT</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Teléfono</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Email</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+            {% for consorcio in consorcios %}
+            <tr class="hover:bg-slate-50">
+                <td class="px-4 py-3 text-sm font-medium text-slate-800">{{ consorcio.nombre }}</td>
+                <td class="px-4 py-3 text-sm text-slate-600">{{ consorcio.direccion }}</td>
+                <td class="px-4 py-3 text-sm text-slate-600">{{ consorcio.cuit }}</td>
+                <td class="px-4 py-3 text-sm text-slate-600">{{ consorcio.telefono }}</td>
+                <td class="px-4 py-3 text-sm text-slate-600">{{ consorcio.email }}</td>
+                <td class="px-4 py-3 text-sm flex items-center gap-3">
+                    <a href="{% url 'editar_consorcio' consorcio.id %}" class="text-slate-600 hover:text-slate-800 font-medium">Editar</a>
+                    <a href="{% url 'eliminar_consorcio' consorcio.id %}" class="text-red-600 hover:text-red-700 font-medium">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm p-12 text-center">
+    <p class="text-slate-500">No hay consorcios registrados.</p>
+</div>
+{% endif %}
+
+{% endblock %}

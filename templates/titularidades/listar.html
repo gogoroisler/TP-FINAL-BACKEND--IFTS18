@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Titularidades{% endblock %}
+{% block content %}
+
+<div class="mb-6 flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-slate-800">Titularidades</h1>
+    <a href="{% url 'crear_titularidad' %}"
+       class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md font-medium transition-colors text-sm">
+        + Nueva titularidad
+    </a>
+</div>
+
+{% if titularidades %}
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-slate-50 border-b border-slate-200">
+            <tr>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Departamento</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Usuario</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Desde</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Hasta</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Estado</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+            {% for t in titularidades %}
+            <tr class="hover:bg-slate-50">
+                <td class="px-4 py-3 text-sm font-medium text-slate-800">{{ t.departamento }}</td>
+                <td class="px-4 py-3 text-sm text-slate-600">{{ t.usuario.username }}</td>
+                <td class="px-4 py-3 text-sm text-slate-600">{{ t.fecha_desde }}</td>
+                <td class="px-4 py-3 text-sm text-slate-600">{{ t.fecha_hasta|default:"—" }}</td>
+                <td class="px-4 py-3">
+                    {% if t.fecha_hasta is None %}
+                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Activa</span>
+                    {% else %}
+                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-500">Finalizada</span>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm flex items-center gap-3">
+                    <a href="{% url 'editar_titularidad' t.id %}" class="text-slate-600 hover:text-slate-800 font-medium">Editar</a>
+                    <a href="{% url 'eliminar_titularidad' t.id %}" class="text-red-600 hover:text-red-700 font-medium">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm p-12 text-center">
+    <p class="text-slate-500">No hay titularidades registradas.</p>
+</div>
+{% endif %}
+
+{% endblock %}

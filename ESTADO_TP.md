@@ -53,6 +53,14 @@ git add . && git commit -m "mensaje" && git push tpfinal borrador
 | Actualizar estado de reclamos (admin) | OK |
 | Módulo de avisos (admin crea, consorcista ve) | OK |
 | Desactivar avisos | OK |
+| Diseño con Tailwind CSS en todos los templates | OK |
+| CRUD Proveedores (vistas custom, sin Django Admin) | OK |
+| CRUD Gastos del consorcio (vistas custom, sin Django Admin) | OK |
+| CRUD Consorcios (vistas custom, sin Django Admin) | OK |
+| CRUD Departamentos (vistas custom, sin Django Admin) | OK |
+| CRUD Titularidades (vistas custom, sin Django Admin) | OK |
+| CRUD Usuarios (vistas custom, sin Django Admin) | OK |
+| CRUD Perfiles (vistas custom, sin Django Admin) | OK |
 
 ## Apps del proyecto
 - core/        -> home, PanelAdminView, PanelConsorcistView
@@ -63,54 +71,93 @@ git add . && git commit -m "mensaje" && git push tpfinal borrador
 - avisos/      -> Aviso
 
 ## Estructura de selectors
+
 - consorcios/selectors.py -> get_departamento_por_usuario, get_titularidad_activa,
                              get_departamento_por_titularidad, get_titular_en_periodo,
                              get_solicitud_por_usuario, get_todas_las_solicitudes,
                              get_solicitudes_pendientes,
                              get_titularidad_activa_por_departamento,
-                             get_titularidades_activas_por_departamento
+                             get_titularidades_activas_por_departamento,
+                             get_todos_los_consorcios, get_todos_los_departamentos,
+                             get_todas_las_titularidades
 - expensas/selectors.py   -> get_todas_las_expensas, get_expensas_por_departamento,
                              get_expensa_por_id, get_gastos_por_consorcio_periodo,
                              calcular_monto_departamento, generar_preview_periodo,
-                             get_resumen_gastos_periodo, get_pagos_por_expensa
-- usuarios/selectors.py   -> get_perfil_por_usuario
+                             get_resumen_gastos_periodo, get_pagos_por_expensa,
+                             get_todos_los_proveedores, get_todos_los_gastos
+- usuarios/selectors.py   -> get_perfil_por_usuario, get_todos_los_perfiles,
+                             get_todos_los_usuarios
 - reclamos/selectors.py   -> get_reclamos_por_usuario, get_todos_los_reclamos,
                              get_reclamo_por_id
 - avisos/selectors.py     -> get_avisos_activos_por_consorcio,
                              get_todos_los_avisos_por_consorcio, get_todos_los_avisos
 
 ## URLs disponibles
-/                                      -> home
-/registro/                             -> registro de usuarios
-/redirigir/                            -> redirect segun rol
-/panel-admin/                          -> PanelAdminView
-/panel-consorcista/                    -> PanelConsorcistView
-/mis-expensas/                         -> MisExpensasView
-/informar-pago/<id>/                   -> informar_pago
-/solicitud/                            -> CrearSolicitudView
-/solicitudes/                          -> ListarSolicitudesView
-/solicitudes/<id>/                     -> gestionar_solicitud
-/solicitudes/retirar/<id>/             -> retirar_permisos
-/listar-expensas/                      -> ListarExpensasView
-/expensa/<id>/                         -> DetalleExpensaView
-/crear-expensa/                        -> CrearExpensaView
-/editar-expensa/<id>/                  -> EditarExpensaView
-/eliminar-expensa/<id>/                -> EliminarExpensaView
-/generar-expensas/                     -> SeleccionarPreviewView
-/preview/<consorcio_id>/<periodo>/     -> PreviewPeriodoView
+
+```
+/                                          -> home
+/registro/                                 -> registro de usuarios
+/redirigir/                                -> redirect segun rol
+/panel-admin/                              -> PanelAdminView
+/panel-consorcista/                        -> PanelConsorcistView
+/mis-expensas/                             -> MisExpensasView
+/informar-pago/<id>/                       -> informar_pago
+/solicitud/                                -> CrearSolicitudView
+/solicitudes/                              -> ListarSolicitudesView
+/solicitudes/<id>/                         -> gestionar_solicitud
+/solicitudes/retirar/<id>/                 -> retirar_permisos
+/listar-expensas/                          -> ListarExpensasView
+/expensa/<id>/                             -> DetalleExpensaView
+/crear-expensa/                            -> CrearExpensaView
+/editar-expensa/<id>/                      -> EditarExpensaView
+/eliminar-expensa/<id>/                    -> EliminarExpensaView
+/generar-expensas/                         -> SeleccionarPreviewView
+/preview/<consorcio_id>/<periodo>/         -> PreviewPeriodoView
 /enviar-expensas/<consorcio_id>/<periodo>/ -> enviar_expensas
-/mis-reclamos/                         -> MisReclamosView
-/crear-reclamo/                        -> CrearReclamoView
-/reclamos/                             -> ListarReclamosView
-/reclamos/actualizar/<id>/             -> actualizar_estado
-/avisos/                               -> ListarAvisosAdminView
-/avisos/nuevo/                         -> CrearAvisoView
-/avisos/editar/<id>/                   -> EditarAvisoView
-/mis-avisos/                           -> MisAvisosView
+/mis-reclamos/                             -> MisReclamosView
+/crear-reclamo/                            -> CrearReclamoView
+/reclamos/                                 -> ListarReclamosView
+/reclamos/actualizar/<id>/                 -> actualizar_estado
+/avisos/                                   -> ListarAvisosAdminView
+/avisos/nuevo/                             -> CrearAvisoView
+/avisos/editar/<id>/                       -> EditarAvisoView
+/mis-avisos/                               -> MisAvisosView
+/proveedores/                              -> ListarProveedoresView
+/proveedores/nuevo/                        -> CrearProveedorView
+/proveedores/editar/<id>/                  -> EditarProveedorView
+/proveedores/eliminar/<id>/                -> EliminarProveedorView
+/gastos/                                   -> ListarGastosView
+/gastos/nuevo/                             -> CrearGastoView
+/gastos/editar/<id>/                       -> EditarGastoView
+/gastos/eliminar/<id>/                     -> EliminarGastoView
+/consorcios/                               -> ListarConsorciosView
+/consorcios/nuevo/                         -> CrearConsorcioView
+/consorcios/editar/<id>/                   -> EditarConsorcioView
+/consorcios/eliminar/<id>/                 -> EliminarConsorcioView
+/departamentos/                            -> ListarDepartamentosView
+/departamentos/nuevo/                      -> CrearDepartamentoView
+/departamentos/editar/<id>/                -> EditarDepartamentoView
+/departamentos/eliminar/<id>/              -> EliminarDepartamentoView
+/titularidades/                            -> ListarTitularidadesView
+/titularidades/nuevo/                      -> CrearTitularidadView
+/titularidades/editar/<id>/                -> EditarTitularidadView
+/titularidades/eliminar/<id>/              -> EliminarTitularidadView
+/perfiles/                                 -> ListarPerfilesView
+/perfiles/nuevo/                           -> CrearPerfilView
+/perfiles/editar/<id>/                     -> EditarPerfilView
+/perfiles/eliminar/<id>/                   -> EliminarPerfilView
+/usuarios/                                 -> ListarUsuariosView
+/usuarios/nuevo/                           -> CrearUsuarioView
+/usuarios/editar/<id>/                     -> EditarUsuarioView
+/usuarios/eliminar/<id>/                   -> EliminarUsuarioView
+```
 
 ## Pendientes
-- [ ] CSS con Bootstrap
-- [ ] README actualizado con nuevas funcionalidades
+- [ ] Página separada de confirmación para conflicto de titulares (UX mejorada)
 
 ## Mejoras futuras
-- [ ] Página separada de confirmación para conflicto de titulares (UX mejorada)
+- [ ] Dashboard con métricas reales en el panel admin
+- [ ] Notificaciones por email
+- [ ] Paginación y filtros en listados
+- [ ] API REST con Django REST Framework
+- [ ] Tests automatizados
