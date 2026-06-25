@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Reclamos{% endblock %}
+{% block content %}
+
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-800">Reclamos del consorcio</h1>
+</div>
+
+{% if reclamos %}
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-slate-50 border-b border-slate-200">
+            <tr>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Departamento</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Título</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Descripción</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Estado</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Fecha</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Actualizar</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+            {% for reclamo in reclamos %}
+            <tr class="hover:bg-slate-50">
+                <td class="px-4 py-3 text-sm text-slate-800">{{ reclamo.departamento }}</td>
+                <td class="px-4 py-3 text-sm text-slate-800 font-medium">{{ reclamo.titulo }}</td>
+                <td class="px-4 py-3 text-sm text-slate-500 max-w-xs">{{ reclamo.descripcion }}</td>
+                <td class="px-4 py-3">
+                    {% if reclamo.estado == 'pendiente' %}
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">{{ reclamo.get_estado_display }}</span>
+                    {% elif reclamo.estado == 'en_proceso' %}
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700">{{ reclamo.get_estado_display }}</span>
+                    {% else %}
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">{{ reclamo.get_estado_display }}</span>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-500">{{ reclamo.fecha_creacion|date:"d/m/Y" }}</td>
+                <td class="px-4 py-3">
+                    <form method="post" action="{% url 'actualizar_estado' reclamo.id %}" class="flex items-center gap-2">
+                        {% csrf_token %}
+                        <select name="estado"
+                                class="border border-slate-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <option value="pendiente" {% if reclamo.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                            <option value="en_proceso" {% if reclamo.estado == 'en_proceso' %}selected{% endif %}>En proceso</option>
+                            <option value="resuelto" {% if reclamo.estado == 'resuelto' %}selected{% endif %}>Resuelto</option>
+                        </select>
+                        <button type="submit"
+                                class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-md text-xs font-medium transition-colors">
+                            Actualizar
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm p-12 text-center">
+    <p class="text-slate-500">No hay reclamos registrados.</p>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,37 +1,99 @@
-<!-- Muestra las expensas del usuario logueado -->
 {% extends 'base.html' %}
-
+{% block title %}Mis Expensas{% endblock %}
 {% block content %}
 
-<h1>Mis Expensas</h1>
+<div class="mb-6 flex items-center justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Mis Expensas</h1>
+        {% if departamento %}
+        <p class="text-slate-500 mt-1">{{ departamento.consorcio }} — {{ departamento }}</p>
+        {% endif %}
+    </div>
+    <a href="{% url 'panel_consorcista' %}"
+       class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-4 py-2 rounded-md font-medium transition-colors text-sm">
+        ← Volver al panel
+    </a>
+</div>
 
-<table border="1">
+{% if expensas_con_pagos %}
+    <div class="space-y-4">
+    {% for item in expensas_con_pagos %}
+        <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-base font-semibold text-slate-800">Período {{ item.expensa.periodo }}</h2>
+                {% if item.expensa.pagada %}
+                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Pagada</span>
+                {% else %}
+                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">Pendiente</span>
+                {% endif %}
+            </div>
 
-    <tr>
-        <th>Periodo</th>
-        <th>Monto</th>
-        <th>Vencimiento</th>
-        <th>Estado</th>
-    </tr>
+            <dl class="grid grid-cols-2 gap-3 mb-4">
+                <div>
+                    <dt class="text-xs text-slate-500">Monto</dt>
+                    <dd class="text-sm font-medium text-slate-800">${{ item.expensa.monto }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-slate-500">Vencimiento</dt>
+                    <dd class="text-sm font-medium text-slate-800">{{ item.expensa.fecha_vencimiento }}</dd>
+                </div>
+            </dl>
 
-    {% for expensa in expensas %}
-
-    <tr>
-        <td>{{ expensa.periodo }}</td>
-        <td>{{ expensa.monto }}</td>
-        <td>{{ expensa.fecha_vencimiento }}</td>
-
-        <td>
-            {% if expensa.pagada %}
-                Pagada
-            {% else %}
-                Pendiente
+            {% if item.pagos %}
+            <div class="mb-4">
+                <h3 class="text-sm font-medium text-slate-700 mb-2">Historial de pagos</h3>
+                <div class="bg-slate-50 rounded-md overflow-hidden">
+                    <table class="w-full">
+                        <thead class="border-b border-slate-200">
+                            <tr>
+                                <th class="text-left px-3 py-2 text-xs font-medium text-slate-500">Fecha</th>
+                                <th class="text-left px-3 py-2 text-xs font-medium text-slate-500">Monto</th>
+                                <th class="text-left px-3 py-2 text-xs font-medium text-slate-500">Nota</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200">
+                            {% for pago in item.pagos %}
+                            <tr>
+                                <td class="px-3 py-2 text-xs text-slate-600">{{ pago.fecha }}</td>
+                                <td class="px-3 py-2 text-xs text-slate-600">${{ pago.monto }}</td>
+                                <td class="px-3 py-2 text-xs text-slate-500">{{ pago.nota }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             {% endif %}
-        </td>
-    </tr>
 
+            {% if not item.expensa.pagada %}
+            <div class="border-t border-slate-100 pt-4">
+                <h3 class="text-sm font-medium text-slate-700 mb-3">Informar pago</h3>
+                <form method="post" action="{% url 'informar_pago' item.expensa.id %}" class="flex flex-wrap items-end gap-3">
+                    {% csrf_token %}
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1">Monto pagado</label>
+                        <input type="number" name="monto" value="{{ item.expensa.monto }}" step="0.01" required
+                               class="border border-slate-300 rounded-md px-3 py-2 text-sm w-36 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1">Nota (opcional)</label>
+                        <input type="text" name="nota" placeholder="N° de comprobante, etc."
+                               class="border border-slate-300 rounded-md px-3 py-2 text-sm w-56 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    </div>
+                    <button type="submit"
+                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md font-medium transition-colors text-sm">
+                        Informar pago
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
     {% endfor %}
-
-</table>
+    </div>
+{% else %}
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm p-12 text-center">
+    <p class="text-slate-500">No tenés expensas registradas todavía.</p>
+</div>
+{% endif %}
 
 {% endblock %}
