@@ -4,6 +4,7 @@ from django.urls import path, include
 from core.views import home, PanelAdminView, PanelConsorcistView
 from consorcios.views import (
     MisExpensasView,
+    DetalleExpensaConsorcistView,
     informar_pago,
     CrearSolicitudView,
     ListarSolicitudesView,
@@ -74,6 +75,7 @@ urlpatterns = [
     path('panel-admin/', PanelAdminView.as_view(), name='panel_admin'),
     path('panel-consorcista/', PanelConsorcistView.as_view(), name='panel_consorcista'),
     path('mis-expensas/', MisExpensasView.as_view(), name='mis_expensas'),
+    path('mis-expensas/<int:expensa_id>/', DetalleExpensaConsorcistView.as_view(), name='detalle_expensa_consorcista'),
     path('informar-pago/<int:expensa_id>/', informar_pago, name='informar_pago'),
     path('solicitud/', CrearSolicitudView.as_view(), name='crear_solicitud'),
     path('solicitudes/', ListarSolicitudesView.as_view(), name='listar_solicitudes'),

@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.urls import reverse_lazy
 
 from consorcios.models import Consorcio, Departamento, Titularidad, SolicitudVinculacion
@@ -18,7 +18,7 @@ from consorcios.selectors import (
     get_todas_las_titularidades,
 )
 from expensas.models import Expensa
-from expensas.selectors import get_expensas_por_departamento, get_pagos_por_expensa, get_credito_disponible
+from expensas.selectors import get_expensas_por_departamento, get_pagos_por_expensa, get_credito_disponible, get_detalle_gastos_por_expensa
 from usuarios.mixins import RolRequeridoMixin
 from usuarios.selectors import get_perfil_por_usuario
 
@@ -71,6 +71,28 @@ class MisExpensasView(RolRequeridoMixin, ListView):
                 'monto_a_pagar': monto_a_pagar,
             })
         context['expensas_con_pagos'] = expensas_con_pagos
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class DetalleExpensaConsorcistView(RolRequeridoMixin, DetailView):
+    rol_requerido = 'consorcista'
+    model = Expensa
+    template_name = 'detalle_expensa_consorcista.html'
+    context_object_name = 'expensa'
+    pk_url_kwarg = 'expensa_id'
+
+    def get_queryset(self):
+        departamento = get_departamento_por_titularidad(self.request.user)
+        if departamento is None:
+            return Expensa.objects.none()
+        return Expensa.objects.filter(departamento=departamento, publicada=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        expensa = self.object
+        context['pagos'] = get_pagos_por_expensa(expensa)
+        context['detalle_gastos'] = get_detalle_gastos_por_expensa(expensa)
         return context
 
 

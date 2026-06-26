@@ -10,7 +10,7 @@ def get_expensas_por_departamento(departamento):
     return Expensa.objects.filter(
         departamento=departamento,
         publicada=True
-    )
+    ).order_by('-periodo')
 
 
 def get_expensa_por_id(expensa_id):
@@ -99,6 +99,46 @@ def get_resumen_gastos_periodo(consorcio, periodo):
     return {
         'gastos': gastos,
         'total': total,
+    }
+
+
+def get_detalle_gastos_por_expensa(expensa):
+    departamento = expensa.departamento
+    consorcio = departamento.consorcio
+    m2_depto = departamento.metros_cuadrados
+    gastos = get_gastos_por_consorcio_periodo(consorcio, expensa.periodo)
+    m2_totales = sum(d.metros_cuadrados for d in consorcio.departamento_set.all())
+
+    detalle = []
+    for gasto in gastos:
+        contribucion = Decimal('0')
+        if gasto.tipo == 'ordinario':
+            if m2_totales > 0:
+                contribucion = gasto.monto * (m2_depto / m2_totales)
+        elif gasto.tipo == 'extraordinario':
+            if gasto.alcance == 'general':
+                if m2_totales > 0:
+                    contribucion = gasto.monto * (m2_depto / m2_totales)
+            elif gasto.alcance == 'por_departamento':
+                deptos_involucrados = gasto.departamentos.all()
+                if departamento not in deptos_involucrados:
+                    continue
+                if gasto.prorrateo == 'igualitario':
+                    cantidad = deptos_involucrados.count()
+                    if cantidad > 0:
+                        contribucion = gasto.monto / cantidad
+                else:
+                    m2_involucrados = sum(d.metros_cuadrados for d in deptos_involucrados)
+                    if m2_involucrados > 0:
+                        contribucion = gasto.monto * (m2_depto / m2_involucrados)
+        detalle.append({
+            'gasto': gasto,
+            'contribucion': contribucion.quantize(Decimal('0.01')),
+        })
+
+    return {
+        'detalle': detalle,
+        'total_consorcio': sum(g.monto for g in gastos),
     }
 
 
