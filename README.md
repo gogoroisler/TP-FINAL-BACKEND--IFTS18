@@ -96,6 +96,14 @@ Las expensas se calculan automáticamente a partir de los gastos del consorcio:
 - Si el total pagado supera el monto (`saldo_pendiente < 0`), el excedente se muestra como crédito disponible
 - El crédito se descuenta automáticamente del saldo pendiente de las expensas impagas al visualizar `/mis-expensas/`
 
+### Detalle de expensa
+
+El consorcista puede ingresar al detalle de cada expensa en `/mis-expensas/<id>/` y ver:
+- Los gastos del consorcio en ese período (proveedor, descripción, tipo, monto total)
+- La contribución que le corresponde a su departamento por cada gasto, según el criterio de prorrateo aplicado
+- El historial de pagos realizados y el saldo pendiente
+- Un botón para imprimir o descargar el detalle como PDF directamente desde el navegador (sin dependencias externas)
+
 ### Flujo de vinculación
 
 1. Consorcista se registra y accede al panel
@@ -190,7 +198,9 @@ python manage.py runserver
 
 ### Consorcista
 - Solicitar vinculación a un consorcio y departamento indicando su condición (dueño o inquilino)
-- Ver sus expensas, informar pagos (parciales o totales) y visualizar crédito disponible
+- Ver sus expensas ordenadas por período, informar pagos (parciales o totales) y visualizar crédito disponible
+- Ver el detalle de cada expensa: composición de gastos del período con el monto que le corresponde por departamento
+- Descargar o imprimir el detalle de una expensa en PDF desde el navegador
 - Crear y ver sus reclamos
 - Ver los avisos activos de su consorcio
 

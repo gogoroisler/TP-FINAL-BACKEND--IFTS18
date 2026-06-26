@@ -18,8 +18,8 @@ El modelo actual es muy básico. Agregarle categorías (rotura, ruido, limpieza,
 **4. Dashboard con métricas**
 El panel admin hoy es solo links de navegación. Un dashboard real mostraría: total adeudado, expensas vencidas, reclamos sin resolver, solicitudes pendientes — todo con datos reales de la base de datos.
 
-**5. Reportes exportables**
-Listar expensas en pantalla está bien, pero el admin necesita exportar: estado de deuda por departamento, composición de gastos por período, listado de morosos. Formatos: PDF y/o Excel.
+**5. Reportes exportables para el administrador**
+El consorcista ya puede imprimir o descargar en PDF el detalle de su propia expensa. Lo que falta es del lado del admin: exportar el estado de deuda por departamento, la composición de gastos por período y el listado de morosos. Formatos: PDF y/o Excel.
 
 **6. Paginación y filtros en listados**
 Con pocos datos no se nota, pero listar expensas o reclamos sin paginar ni filtrar no escala. Django tiene paginación nativa y es trabajo menor.
@@ -54,3 +54,4 @@ Hoy el crédito por sobrepago se muestra en la vista del consorcista pero no se 
 - Cálculo de expensas con los 4 casos de prorrateo (ordinario/extraordinario × proporcional/igualitario).
 - Diseño con Tailwind CSS aplicado en todos los templates.
 - CRUD completo sin Django Admin: consorcios, departamentos, titularidades, proveedores, gastos, usuarios y perfiles tienen vistas propias con Tailwind.
+- Detalle de expensa por consorcista: composición de gastos del período con contribución por departamento y descarga en PDF.
