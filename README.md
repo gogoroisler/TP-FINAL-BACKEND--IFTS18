@@ -170,15 +170,80 @@ python manage.py runserver
 
 ---
 
-## Acceso al sistema
+## Referencia de URLs
 
+### Acceso general
 | URL | Descripción |
 |-----|-------------|
-| `http://127.0.0.1:8000/` | Home |
-| `http://127.0.0.1:8000/admin/` | Django Admin (solo configuración inicial) |
-| `http://127.0.0.1:8000/registro/` | Registro de usuarios |
-| `http://127.0.0.1:8000/panel-admin/` | Panel administrador |
-| `http://127.0.0.1:8000/panel-consorcista/` | Panel consorcista |
+| `/` | Home |
+| `/registro/` | Registro de usuarios |
+| `/panel-admin/` | Panel administrador |
+| `/panel-consorcista/` | Panel consorcista |
+| `/admin/` | Django Admin (solo configuración inicial de perfil) |
+
+### Consorcista
+| URL | Descripción |
+|-----|-------------|
+| `/solicitud/` | Solicitar vinculación a un departamento |
+| `/mis-expensas/` | Ver expensas propias |
+| `/mis-expensas/<id>/` | Detalle de expensa con composición de gastos |
+| `/informar-pago/<id>/` | Informar pago de una expensa |
+| `/crear-reclamo/` | Crear reclamo |
+| `/mis-reclamos/` | Ver reclamos propios |
+| `/mis-avisos/` | Ver avisos activos del consorcio |
+
+### Administrador — Gestión
+| URL | Descripción |
+|-----|-------------|
+| `/solicitudes/` | Listar y gestionar solicitudes de vinculación |
+| `/solicitudes/<id>/` | Aprobar o rechazar una solicitud |
+| `/solicitudes/retirar/<id>/` | Retirar permisos a un consorcista |
+| `/consorcios/` | Listar consorcios |
+| `/consorcios/nuevo/` | Crear consorcio |
+| `/consorcios/editar/<id>/` | Editar consorcio |
+| `/consorcios/eliminar/<id>/` | Eliminar consorcio |
+| `/departamentos/` | Listar departamentos (filtro por consorcio) |
+| `/departamentos/nuevo/` | Crear departamento |
+| `/departamentos/editar/<id>/` | Editar departamento |
+| `/departamentos/eliminar/<id>/` | Eliminar departamento |
+| `/titularidades/` | Listar titularidades (filtros por consorcio y departamento) |
+| `/titularidades/nuevo/` | Crear titularidad |
+| `/titularidades/editar/<id>/` | Editar titularidad |
+| `/titularidades/eliminar/<id>/` | Eliminar titularidad |
+| `/usuarios/` | Listar usuarios |
+| `/usuarios/nuevo/` | Crear usuario |
+| `/usuarios/editar/<id>/` | Editar usuario |
+| `/usuarios/eliminar/<id>/` | Eliminar usuario |
+| `/perfiles/` | Listar perfiles |
+| `/perfiles/nuevo/` | Crear perfil |
+| `/perfiles/editar/<id>/` | Editar perfil |
+| `/perfiles/eliminar/<id>/` | Eliminar perfil |
+
+### Administrador — Expensas y gastos
+| URL | Descripción |
+|-----|-------------|
+| `/gastos/` | Listar gastos (filtros por consorcio, proveedor, período) |
+| `/gastos/nuevo/` | Crear gasto |
+| `/gastos/editar/<id>/` | Editar gasto |
+| `/gastos/eliminar/<id>/` | Eliminar gasto |
+| `/proveedores/` | Listar proveedores |
+| `/proveedores/nuevo/` | Crear proveedor |
+| `/proveedores/editar/<id>/` | Editar proveedor |
+| `/proveedores/eliminar/<id>/` | Eliminar proveedor |
+| `/generar-expensas/` | Seleccionar consorcio y período para generar expensas |
+| `/preview/<consorcio_id>/<periodo>/` | Vista previa del cálculo por departamento |
+| `/enviar-expensas/<consorcio_id>/<periodo>/` | Confirmar y generar expensas |
+| `/listar-expensas/` | Listar expensas (filtros por consorcio, período, departamento) |
+| `/expensa/<id>/` | Detalle de expensa (vista admin) |
+
+### Administrador — Reclamos y avisos
+| URL | Descripción |
+|-----|-------------|
+| `/reclamos/` | Listar reclamos (filtros por consorcio y estado) |
+| `/reclamos/actualizar/<id>/` | Actualizar estado de un reclamo |
+| `/avisos/` | Listar avisos (filtro por consorcio) |
+| `/avisos/nuevo/` | Crear aviso |
+| `/avisos/editar/<id>/` | Editar aviso |
 
 ---
 
