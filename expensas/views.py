@@ -186,7 +186,30 @@ class ListarGastosView(RolRequeridoMixin, ListView):
     context_object_name = 'gastos'
 
     def get_queryset(self):
-        return get_todos_los_gastos()
+        qs = get_todos_los_gastos()
+        consorcio_id = self.request.GET.get('consorcio_id')
+        proveedor_id = self.request.GET.get('proveedor_id')
+        periodo = self.request.GET.get('periodo')
+        if consorcio_id:
+            qs = qs.filter(consorcio_id=consorcio_id)
+        if proveedor_id:
+            qs = qs.filter(proveedor_id=proveedor_id)
+        if periodo:
+            qs = qs.filter(periodo=periodo)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['consorcios'] = get_todos_los_consorcios()
+        context['proveedores'] = get_todos_los_proveedores()
+        context['periodos'] = (
+            GastoConsorcio.objects.values_list('periodo', flat=True)
+            .distinct().order_by('-periodo')
+        )
+        context['consorcio_id_seleccionado'] = self.request.GET.get('consorcio_id', '')
+        context['proveedor_id_seleccionado'] = self.request.GET.get('proveedor_id', '')
+        context['periodo_seleccionado'] = self.request.GET.get('periodo', '')
+        return context
 
 
 @method_decorator(login_required, name='dispatch')
