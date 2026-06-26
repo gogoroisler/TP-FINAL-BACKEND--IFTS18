@@ -257,7 +257,17 @@ class ListarDepartamentosView(RolRequeridoMixin, ListView):
     context_object_name = 'departamentos'
 
     def get_queryset(self):
-        return get_todos_los_departamentos()
+        qs = get_todos_los_departamentos()
+        consorcio_id = self.request.GET.get('consorcio_id')
+        if consorcio_id:
+            qs = qs.filter(consorcio_id=consorcio_id)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['consorcios'] = get_todos_los_consorcios()
+        context['consorcio_id_seleccionado'] = self.request.GET.get('consorcio_id', '')
+        return context
 
 
 @method_decorator(login_required, name='dispatch')
