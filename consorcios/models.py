@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class Consorcio(models.Model):
     nombre = models.CharField(max_length=100)
     direccion = models.CharField(max_length=200)
-    cuit = models.CharField(max_length=20)
+    cuit = models.CharField(max_length=20, unique=True)
     telefono = models.CharField(max_length=20)
     email = models.EmailField()
 
@@ -20,6 +20,9 @@ class Departamento(models.Model):
     propietario = models.CharField(max_length=100)
     metros_cuadrados = models.DecimalField(max_digits=7, decimal_places=2, default=0)
     usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    class Meta:
+        unique_together = [['consorcio', 'numero']]
 
     def __str__(self):
         return f'Departamento {self.numero} - {self.consorcio.nombre}'
