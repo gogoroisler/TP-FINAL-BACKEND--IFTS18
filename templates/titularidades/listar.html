@@ -10,26 +10,49 @@
     </a>
 </div>
 
-<!-- Filtro por departamento -->
-<form method="get" class="mb-6 flex items-center gap-3">
-    <select name="departamento_id"
-            class="border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-        <option value="">Todos los departamentos</option>
-        {% for depto in departamentos %}
-            <option value="{{ depto.id }}" {% if departamento_id_seleccionado == depto.id|stringformat:"s" %}selected{% endif %}>
-                {{ depto }}
-            </option>
-        {% endfor %}
-    </select>
-    <button type="submit"
-            class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-md font-medium transition-colors text-sm">
-        Filtrar
-    </button>
-    {% if departamento_id_seleccionado %}
-    <a href="{% url 'listar_titularidades' %}"
-       class="text-sm text-slate-500 hover:text-slate-700">Limpiar filtro</a>
-    {% endif %}
-</form>
+{# Panel de filtros #}
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm p-4 mb-6">
+    <form method="get" class="flex flex-wrap items-end gap-4">
+        <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Consorcio</label>
+            <select name="consorcio_id" onchange="this.form.submit()"
+                    class="border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                <option value="">Todos</option>
+                {% for consorcio in consorcios %}
+                <option value="{{ consorcio.id }}"
+                    {% if consorcio_id_seleccionado == consorcio.id|stringformat:"s" %}selected{% endif %}>
+                    {{ consorcio.nombre }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Departamento</label>
+            <select name="departamento_id"
+                    class="border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                <option value="">Todos</option>
+                {% for depto in departamentos %}
+                <option value="{{ depto.id }}"
+                    {% if departamento_id_seleccionado == depto.id|stringformat:"s" %}selected{% endif %}>
+                    {{ depto }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="flex gap-2">
+            <button type="submit"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md font-medium transition-colors text-sm">
+                Filtrar
+            </button>
+            {% if consorcio_id_seleccionado or departamento_id_seleccionado %}
+            <a href="{% url 'listar_titularidades' %}"
+               class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-4 py-2 rounded-md font-medium transition-colors text-sm">
+                Limpiar
+            </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
 
 {% if titularidades %}
 <div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
@@ -77,7 +100,13 @@
 </div>
 {% else %}
 <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-12 text-center">
-    <p class="text-slate-500">No hay titularidades{% if departamento_id_seleccionado %} para el departamento seleccionado{% endif %}.</p>
+    <p class="text-slate-500">
+        {% if consorcio_id_seleccionado or departamento_id_seleccionado %}
+            No hay titularidades que coincidan con los filtros seleccionados.
+        {% else %}
+            No hay titularidades registradas.
+        {% endif %}
+    </p>
 </div>
 {% endif %}
 

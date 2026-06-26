@@ -307,14 +307,24 @@ class ListarTitularidadesView(RolRequeridoMixin, ListView):
 
     def get_queryset(self):
         qs = get_todas_las_titularidades()
+        consorcio_id = self.request.GET.get('consorcio_id')
         departamento_id = self.request.GET.get('departamento_id')
+        if consorcio_id:
+            qs = qs.filter(departamento__consorcio_id=consorcio_id)
         if departamento_id:
             qs = qs.filter(departamento_id=departamento_id)
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['departamentos'] = get_todos_los_departamentos()
+        consorcio_id = self.request.GET.get('consorcio_id', '')
+        context['consorcios'] = get_todos_los_consorcios()
+        context['departamentos'] = (
+            Departamento.objects.filter(consorcio_id=consorcio_id).order_by('numero')
+            if consorcio_id
+            else get_todos_los_departamentos()
+        )
+        context['consorcio_id_seleccionado'] = consorcio_id
         context['departamento_id_seleccionado'] = self.request.GET.get('departamento_id', '')
         return context
 
