@@ -72,7 +72,7 @@ class CrearSolicitudView(RolRequeridoMixin, CreateView):
     rol_requerido = 'consorcista'
     model = SolicitudVinculacion
     template_name = 'crear_solicitud.html'
-    fields = ['consorcio', 'departamento', 'condicion']
+    fields = ['departamento', 'condicion']
     success_url = reverse_lazy('mis_expensas')
 
     def dispatch(self, request, *args, **kwargs):
@@ -82,16 +82,12 @@ class CrearSolicitudView(RolRequeridoMixin, CreateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        departamento = form.cleaned_data['departamento']
-        consorcio = form.cleaned_data['consorcio']
-        if departamento.consorcio != consorcio:
-            form.add_error('departamento', 'El departamento no pertenece al consorcio seleccionado.')
-            return self.form_invalid(form)
         SolicitudVinculacion.objects.filter(
             usuario=self.request.user,
             estado='rechazada'
         ).delete()
         form.instance.usuario = self.request.user
+        form.instance.consorcio = form.cleaned_data['departamento'].consorcio
         return super().form_valid(form)
 
 
