@@ -4,7 +4,8 @@ from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView, TemplateView
 
-from consorcios.models import Consorcio
+from consorcios.models import Consorcio, Departamento
+from consorcios.selectors import get_todos_los_consorcios, get_todos_los_departamentos
 from usuarios.mixins import RolRequeridoMixin
 from usuarios.selectors import get_perfil_por_usuario
 from .models import Expensa, Proveedor, GastoConsorcio
@@ -26,7 +27,35 @@ class ListarExpensasView(RolRequeridoMixin, ListView):
     context_object_name = 'expensas'
 
     def get_queryset(self):
-        return get_todas_las_expensas()
+        qs = get_todas_las_expensas()
+        consorcio_id = self.request.GET.get('consorcio_id')
+        periodo = self.request.GET.get('periodo')
+        departamento_id = self.request.GET.get('departamento_id')
+        if consorcio_id:
+            qs = qs.filter(departamento__consorcio_id=consorcio_id)
+        if periodo:
+            qs = qs.filter(periodo=periodo)
+        if departamento_id:
+            qs = qs.filter(departamento_id=departamento_id)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        consorcio_id = self.request.GET.get('consorcio_id', '')
+        context['consorcios'] = get_todos_los_consorcios()
+        context['periodos'] = (
+            Expensa.objects.values_list('periodo', flat=True)
+            .distinct().order_by('-periodo')
+        )
+        context['departamentos'] = (
+            Departamento.objects.filter(consorcio_id=consorcio_id).order_by('numero')
+            if consorcio_id
+            else get_todos_los_departamentos()
+        )
+        context['consorcio_id_seleccionado'] = consorcio_id
+        context['periodo_seleccionado'] = self.request.GET.get('periodo', '')
+        context['departamento_id_seleccionado'] = self.request.GET.get('departamento_id', '')
+        return context
 
 
 @method_decorator(login_required, name='dispatch')

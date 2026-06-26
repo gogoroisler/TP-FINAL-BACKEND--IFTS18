@@ -3,7 +3,7 @@ from .models import Expensa, GastoConsorcio
 
 
 def get_todas_las_expensas():
-    return Expensa.objects.all()
+    return Expensa.objects.select_related('departamento__consorcio').order_by('-periodo', 'departamento__consorcio__nombre', 'departamento__numero')
 
 
 def get_expensas_por_departamento(departamento):
