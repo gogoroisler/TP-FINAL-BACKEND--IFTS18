@@ -40,6 +40,12 @@ La lógica de cálculo de expensas (4 combinaciones de tipo/alcance/prorrateo) e
 **10. Docker + CI/CD**
 Para que el proyecto pueda desplegarse en cualquier servidor sin depender del ambiente local. GitHub Actions para correr los tests automáticamente en cada push.
 
+**13. Logging estructurado de errores**
+Hoy los errores de servidor (500) no dejan rastro registrado. Configurar el sistema de logging de Django para escribir errores a un archivo o servicio externo (Sentry, Logtail) permite diagnosticar problemas en producción sin acceso directo al servidor.
+
+**14. Protección ante volúmenes extremos de datos**
+Sin paginación ni límites en los querysets, un listado con miles de registros puede volverse lento o consumir memoria excesiva. Agregar paginación nativa de Django y limitar los querysets más pesados es la mitigación directa.
+
 ---
 
 **11. Múltiples vinculaciones y desvinculación por el consorcista**
