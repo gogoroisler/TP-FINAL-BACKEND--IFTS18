@@ -169,3 +169,7 @@ El flujo de trabajo fue iterativo: el equipo definía el requisito o el problema
 El uso de IA aceleró significativamente la escritura de código repetitivo (templates, vistas CRUD, migraciones) y ayudó a detectar inconsistencias lógicas en el modelo de datos que de otro modo podrían haber pasado desapercibidas.
 
 El riesgo principal de este tipo de asistencia es delegar también el entendimiento. Para mitigarlo, cada decisión relevante está documentada en este archivo con su razonamiento — de forma que cualquier integrante del equipo pueda explicar por qué el sistema funciona como funciona, no solo que funciona.
+
+### Artefacto: contexto estructurado para el asistente
+
+Para trabajar de forma consistente entre sesiones, se construyó un archivo de contexto en `.github/skills/contexto-tp/SKILL.md`. Este archivo sintetiza la arquitectura, los modelos, los patrones de código y los flujos de negocio del sistema en un formato que permite retomar el trabajo con Claude Code sin re-descubrir el contexto desde cero en cada sesión. Es un ejemplo concreto de cómo se puede usar IA de forma metódica en un proyecto real.
