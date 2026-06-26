@@ -5,7 +5,7 @@ from .validators import validar_formato_periodo
 
 class Proveedor(models.Model):
     nombre = models.CharField(max_length=100)
-    cuit = models.CharField(max_length=20)
+    cuit = models.CharField(max_length=20, unique=True)
     rubro = models.CharField(max_length=100)
 
     def __str__(self):
