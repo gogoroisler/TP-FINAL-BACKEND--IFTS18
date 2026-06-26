@@ -42,7 +42,10 @@ Para que el proyecto pueda desplegarse en cualquier servidor sin depender del am
 
 ---
 
-**11. Sistema de crédito automático entre períodos**
+**11. Múltiples vinculaciones y desvinculación por el consorcista**
+Hoy un consorcista solo puede tener una vinculación activa a la vez. La mejora implicaría permitir que un consorcista solicite vinculación a más de un departamento simultáneamente (por ejemplo, si administra dos unidades), y que pueda solicitar su propia desvinculación sin necesidad de que el admin retire los permisos manualmente. Requiere refactorizar `MisExpensasView` para agrupar expensas por departamento y actualizar la lógica de solicitudes.
+
+**12. Sistema de crédito automático entre períodos**
 Hoy el crédito por sobrepago se muestra en la vista del consorcista pero no se aplica automáticamente al generar la expensa del próximo período. La mejora implicaría un campo `credito` en `Perfil` o un modelo `CreditoConsorcista` que acumule saldos a favor y los descuente al crear nuevas expensas, sin intervención del admin.
 
 ---

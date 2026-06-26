@@ -55,6 +55,13 @@ def get_titularidades_activas_por_departamento(departamento):
     )
 
 
+def get_titularidades_activas_por_usuario(usuario):
+    return Titularidad.objects.filter(
+        usuario=usuario,
+        fecha_hasta__isnull=True
+    ).select_related('departamento__consorcio')
+
+
 def get_todos_los_consorcios():
     from .models import Consorcio
     return Consorcio.objects.all().order_by('nombre')

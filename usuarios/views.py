@@ -2,10 +2,13 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.db.models import Prefetch
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from consorcios.models import Titularidad, Departamento
+from consorcios.selectors import get_todos_los_consorcios, get_todos_los_departamentos
 from .forms import RegistroForm
 from .models import Perfil
 from .selectors import get_perfil_por_usuario, get_todos_los_perfiles, get_todos_los_usuarios
@@ -86,7 +89,48 @@ class ListarUsuariosView(RolRequeridoMixin, ListView):
     context_object_name = 'usuarios'
 
     def get_queryset(self):
-        return get_todos_los_usuarios()
+        qs = get_todos_los_usuarios().select_related('perfil')
+        rol = self.request.GET.get('rol')
+        consorcio_id = self.request.GET.get('consorcio_id')
+        departamento_id = self.request.GET.get('departamento_id')
+        if rol == 'admin':
+            qs = qs.filter(perfil__rol='admin')
+        elif rol == 'consorcista':
+            qs = qs.filter(perfil__rol='consorcista')
+        elif rol == 'sin_perfil':
+            qs = qs.filter(perfil__isnull=True)
+        if consorcio_id:
+            qs = qs.filter(
+                titularidad__departamento__consorcio_id=consorcio_id,
+                titularidad__fecha_hasta__isnull=True
+            ).distinct()
+        if departamento_id:
+            qs = qs.filter(
+                titularidad__departamento_id=departamento_id,
+                titularidad__fecha_hasta__isnull=True
+            ).distinct()
+        return qs.prefetch_related(
+            Prefetch(
+                'titularidad_set',
+                queryset=Titularidad.objects.filter(fecha_hasta__isnull=True)
+                    .select_related('departamento__consorcio'),
+                to_attr='titularidades_activas'
+            )
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        consorcio_id = self.request.GET.get('consorcio_id', '')
+        context['consorcios'] = get_todos_los_consorcios()
+        context['departamentos'] = (
+            Departamento.objects.filter(consorcio_id=consorcio_id).order_by('numero')
+            if consorcio_id
+            else get_todos_los_departamentos()
+        )
+        context['rol_seleccionado'] = self.request.GET.get('rol', '')
+        context['consorcio_id_seleccionado'] = consorcio_id
+        context['departamento_id_seleccionado'] = self.request.GET.get('departamento_id', '')
+        return context
 
 
 @method_decorator(login_required, name='dispatch')
