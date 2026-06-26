@@ -2,8 +2,8 @@
 
 ## Etapa 1 — Completar el núcleo de negocio
 
-**1. Expensas: estado de pago real**
-El modelo actual tiene `pagada` como booleano, pero ya permite pagos parciales. El campo debería calcularse automáticamente comparando la suma de pagos contra el monto total, y mostrar el saldo pendiente en la vista del consorcista.
+**1. ~~Expensas: estado de pago real~~ ✅ Implementado**
+`Expensa.pagada` se actualiza automáticamente vía signals de Django (`post_save` y `post_delete` en `Pago`). El saldo pendiente y el crédito por sobrepago se muestran en `/mis-expensas/`.
 
 **2. Notificaciones por email**
 Hoy no existe ningún canal de comunicación automática. Con el sistema de email de Django (sin librerías externas) se puede notificar al consorcista cuando su solicitud es aprobada/rechazada, cuando vence una expensa, o cuando cambia el estado de su reclamo.

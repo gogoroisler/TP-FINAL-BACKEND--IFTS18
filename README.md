@@ -28,6 +28,7 @@ El proyecto sigue los siguientes patrones de diseño:
 - **CBV (Class Based Views):** todas las vistas están implementadas como clases
 - **RolRequeridoMixin:** controla el acceso por rol en todas las CBV
 - **selectors.py por app:** todas las consultas a la base de datos están centralizadas en archivos `selectors.py`, nunca en las vistas
+- **Signals de Django:** `post_save` y `post_delete` en `Pago` actualizan automáticamente el estado de `Expensa.pagada`
 
 ### Apps
 
@@ -45,15 +46,15 @@ El proyecto sigue los siguientes patrones de diseño:
 ## Modelos principales
 
 ### consorcios
-- **Consorcio:** nombre, dirección, CUIT, teléfono, email
-- **Departamento:** consorcio, número, piso, propietario, metros cuadrados, usuario
-- **Titularidad:** departamento, usuario, fecha_desde, fecha_hasta — permite registro histórico de titulares
-- **SolicitudVinculacion:** usuario, consorcio, departamento, estado (pendiente/aprobada/rechazada), nota_admin
+- **Consorcio:** nombre, dirección, CUIT (único), teléfono, email
+- **Departamento:** consorcio, número, piso, propietario, metros cuadrados — `unique_together` en (consorcio, número)
+- **Titularidad:** departamento, usuario, condición (dueño/inquilino), fecha_desde, fecha_hasta — permite registro histórico de titulares
+- **SolicitudVinculacion:** usuario, consorcio (derivado del departamento), departamento, condición (dueño/inquilino), estado (pendiente/aprobada/rechazada), nota_admin
 
 ### expensas
-- **Proveedor:** nombre, CUIT, rubro
+- **Proveedor:** nombre, CUIT (único), rubro
 - **GastoConsorcio:** consorcio, proveedor, período, descripción, monto, tipo (ordinario/extraordinario), alcance (general/por departamento), prorrateo (proporcional/igualitario)
-- **Expensa:** departamento, período, monto calculado, fecha de vencimiento, estado de pago, publicada
+- **Expensa:** departamento, período, monto calculado, fecha de vencimiento, estado de pago (`pagada`), publicada — `pagada` se actualiza automáticamente vía signals
 - **Pago:** expensa, fecha, monto, nota
 
 ### usuarios
@@ -88,19 +89,27 @@ Las expensas se calculan automáticamente a partir de los gastos del consorcio:
 4. Al confirmar, se crean las expensas con `publicada=True`
 5. El consorcista las visualiza en `/mis-expensas/`
 
+### Estado de pago y pagos parciales
+
+- El campo `Expensa.pagada` se actualiza automáticamente mediante signals de Django (`post_save` y `post_delete` en `Pago`)
+- Los pagos parciales son permitidos: un pago puede ser menor al monto total de la expensa
+- Si el total pagado supera el monto (`saldo_pendiente < 0`), el excedente se muestra como crédito disponible
+- El crédito se descuenta automáticamente del saldo pendiente de las expensas impagas al visualizar `/mis-expensas/`
+
 ### Flujo de vinculación
 
 1. Consorcista se registra y accede al panel
-2. Solicita vinculación a un consorcio y departamento
-3. Admin aprueba → se crea una Titularidad activa
-4. Admin puede retirar permisos → se cierra la Titularidad (fecha_hasta = hoy)
-5. Si el departamento ya tiene un titular activo, el admin puede reemplazarlo o agregar uno adicional
+2. Solicita vinculación eligiendo departamento y condición (dueño o inquilino)
+3. Admin aprueba → se crea una Titularidad activa con la condición indicada
+4. Si el departamento ya tiene un titular activo, el admin puede reemplazarlo o agregar uno adicional
+5. Admin puede retirar permisos → se cierra la Titularidad (`fecha_hasta = hoy`)
 
 ### Titularidad
 
 - El sistema mantiene un registro histórico de todos los titulares de cada departamento
 - Una titularidad activa tiene `fecha_hasta = null`
 - Un departamento puede tener múltiples titulares activos simultáneos
+- Al crear una titularidad desde el panel, si ya existe un titular activo se muestra una pantalla de confirmación antes de proceder
 
 ---
 
@@ -158,7 +167,7 @@ python manage.py runserver
 | URL | Descripción |
 |-----|-------------|
 | `http://127.0.0.1:8000/` | Home |
-| `http://127.0.0.1:8000/admin/` | Django Admin |
+| `http://127.0.0.1:8000/admin/` | Django Admin (solo configuración inicial) |
 | `http://127.0.0.1:8000/registro/` | Registro de usuarios |
 | `http://127.0.0.1:8000/panel-admin/` | Panel administrador |
 | `http://127.0.0.1:8000/panel-consorcista/` | Panel consorcista |
@@ -169,8 +178,9 @@ python manage.py runserver
 
 ### Administrador
 - Gestionar consorcios, departamentos, titularidades y proveedores desde el panel
-- Gestionar usuarios y perfiles desde el panel
+- Gestionar usuarios y perfiles desde el panel (sin Django Admin)
 - Aprobar, rechazar y gestionar solicitudes de vinculación
+- Al aprobar, la condición (dueño/inquilino) indicada por el consorcista se traslada automáticamente a la titularidad
 - Retirar permisos a consorcistas
 - Cargar y gestionar gastos del consorcio por período y proveedor
 - Generar expensas con vista previa y cálculo automático
@@ -179,8 +189,8 @@ python manage.py runserver
 - Crear y gestionar avisos por consorcio
 
 ### Consorcista
-- Solicitar vinculación a un consorcio y departamento
-- Ver sus expensas e informar pagos
+- Solicitar vinculación a un consorcio y departamento indicando su condición (dueño o inquilino)
+- Ver sus expensas, informar pagos (parciales o totales) y visualizar crédito disponible
 - Crear y ver sus reclamos
 - Ver los avisos activos de su consorcio
 
@@ -198,7 +208,7 @@ python manage.py runserver
 
 ## Mejoras futuras
 
-- API REST con Django REST Framework
+Ver [ROADMAP.md](ROADMAP.md) para la hoja de ruta completa.
 
 ---
 
