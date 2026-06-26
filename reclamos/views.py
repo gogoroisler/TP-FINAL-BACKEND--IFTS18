@@ -4,7 +4,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import ListView, CreateView
 from django.urls import reverse_lazy
 
-from consorcios.selectors import get_departamento_por_titularidad
+from consorcios.selectors import get_departamento_por_titularidad, get_todos_los_consorcios
 from usuarios.mixins import RolRequeridoMixin
 from usuarios.selectors import get_perfil_por_usuario
 from .models import Reclamo
@@ -48,7 +48,22 @@ class ListarReclamosView(RolRequeridoMixin, ListView):
     context_object_name = 'reclamos'
 
     def get_queryset(self):
-        return get_todos_los_reclamos()
+        qs = get_todos_los_reclamos()
+        consorcio_id = self.request.GET.get('consorcio_id')
+        estado = self.request.GET.get('estado')
+        if consorcio_id:
+            qs = qs.filter(departamento__consorcio_id=consorcio_id)
+        if estado:
+            qs = qs.filter(estado=estado)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['consorcios'] = get_todos_los_consorcios()
+        context['estados'] = Reclamo.ESTADO_CHOICES
+        context['consorcio_id_seleccionado'] = self.request.GET.get('consorcio_id', '')
+        context['estado_seleccionado'] = self.request.GET.get('estado', '')
+        return context
 
 
 @login_required
