@@ -42,6 +42,11 @@ Para que el proyecto pueda desplegarse en cualquier servidor sin depender del am
 
 ---
 
+**11. Sistema de crédito automático entre períodos**
+Hoy el crédito por sobrepago se muestra en la vista del consorcista pero no se aplica automáticamente al generar la expensa del próximo período. La mejora implicaría un campo `credito` en `Perfil` o un modelo `CreditoConsorcista` que acumule saldos a favor y los descuente al crear nuevas expensas, sin intervención del admin.
+
+---
+
 ## Lo que está sólido y no se toca
 
 - Arquitectura (CBV + selectors + RolRequeridoMixin) bien pensada y escalable.

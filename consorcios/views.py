@@ -18,7 +18,7 @@ from consorcios.selectors import (
     get_todas_las_titularidades,
 )
 from expensas.models import Expensa
-from expensas.selectors import get_expensas_por_departamento, get_pagos_por_expensa
+from expensas.selectors import get_expensas_por_departamento, get_pagos_por_expensa, get_credito_disponible
 from usuarios.mixins import RolRequeridoMixin
 from usuarios.selectors import get_perfil_por_usuario
 
@@ -57,11 +57,22 @@ class MisExpensasView(RolRequeridoMixin, ListView):
         if not departamento:
             departamento = get_departamento_por_usuario(self.request.user)
         context['departamento'] = departamento
+        credito_restante = get_credito_disponible(departamento) if departamento else 0
         expensas_con_pagos = []
         for expensa in context['expensas']:
+            saldo = expensa.saldo_pendiente
+            if saldo > 0 and credito_restante > 0:
+                credito_aplicado = min(credito_restante, saldo)
+                credito_restante -= credito_aplicado
+                monto_a_pagar = saldo - credito_aplicado
+            else:
+                credito_aplicado = 0
+                monto_a_pagar = max(saldo, 0)
             expensas_con_pagos.append({
                 'expensa': expensa,
                 'pagos': get_pagos_por_expensa(expensa),
+                'credito_aplicado': credito_aplicado,
+                'monto_a_pagar': monto_a_pagar,
             })
         context['expensas_con_pagos'] = expensas_con_pagos
         return context

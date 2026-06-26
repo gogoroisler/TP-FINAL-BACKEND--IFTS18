@@ -114,3 +114,16 @@ def get_todos_los_proveedores():
 
 def get_todos_los_gastos():
     return GastoConsorcio.objects.all().order_by('-periodo')
+
+
+def get_credito_disponible(departamento):
+    expensas = Expensa.objects.filter(
+        departamento=departamento,
+        publicada=True,
+    ).prefetch_related('pagos')
+    credito = Decimal('0')
+    for expensa in expensas:
+        saldo = expensa.saldo_pendiente
+        if saldo < 0:
+            credito += abs(saldo)
+    return credito
