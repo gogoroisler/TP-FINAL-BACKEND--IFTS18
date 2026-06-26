@@ -139,3 +139,33 @@ En los casos donde un filtro depende de otro (por ejemplo, el dropdown de depart
 | Gastos | Consorcio, Proveedor, Período |
 | Departamentos | Consorcio |
 | Titularidades | Consorcio, Departamento |
+
+---
+
+## 6. Uso de inteligencia artificial en el desarrollo
+
+Este proyecto fue desarrollado con asistencia de **Claude Code** (Anthropic), utilizado como herramienta de pair programming a lo largo de todo el proceso.
+
+### Cómo se utilizó
+
+El flujo de trabajo fue iterativo: el equipo definía el requisito o el problema, Claude proponía opciones de implementación con sus trade-offs, y el equipo tomaba la decisión antes de proceder. En ningún caso se aceptó una implementación sin antes discutir por qué era la más adecuada para este contexto.
+
+### División de responsabilidades
+
+**El equipo definió y decidió:**
+- Los requisitos funcionales y el modelo de negocio (cómo funciona la vinculación, qué pasa con titulares en conflicto, si permitir pagos adelantados)
+- La arquitectura general (CBV + selectors.py + RolRequeridoMixin) antes de que se escribiera una línea
+- Qué problemas valían la pena resolver ahora y cuáles quedaban para el ROADMAP
+- Las prioridades de desarrollo en cada sesión de trabajo
+
+**La IA asistió con:**
+- Generación de código siguiendo los patrones ya acordados
+- Identificación de bugs y casos borde (el `post_delete` en señales, el `non_field_errors` no renderizado, la doble fuente de verdad en `Departamento.usuario`)
+- Redacción de documentación a partir de las decisiones ya tomadas
+- Sugerencia de opciones técnicas cuando había más de un camino válido
+
+### Evaluación crítica
+
+El uso de IA aceleró significativamente la escritura de código repetitivo (templates, vistas CRUD, migraciones) y ayudó a detectar inconsistencias lógicas en el modelo de datos que de otro modo podrían haber pasado desapercibidas.
+
+El riesgo principal de este tipo de asistencia es delegar también el entendimiento. Para mitigarlo, cada decisión relevante está documentada en este archivo con su razonamiento — de forma que cualquier integrante del equipo pueda explicar por qué el sistema funciona como funciona, no solo que funciona.

@@ -18,6 +18,7 @@ Sistema web desarrollado en Django para la gestión integral de consorcios. Perm
 - SQLite3
 - HTML + Tailwind CSS (via CDN)
 - Git / GitHub
+- Claude Code (Anthropic) — asistencia de IA durante el desarrollo (ver [DECISIONES.md](DECISIONES.md#6-uso-de-inteligencia-artificial-en-el-desarrollo))
 
 ---
 
