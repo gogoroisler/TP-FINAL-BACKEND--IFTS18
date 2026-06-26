@@ -112,6 +112,10 @@ Al intentar agregar `unique=True` al campo `cuit` de `Consorcio`, se añadió ac
 
 **Solución:** editar directamente el campo original en el modelo en lugar de agregar uno nuevo, y descartar la migración incorrecta.
 
+### Páginas de error: 500 standalone, 404 extiende base.html
+
+`404.html` extiende `base.html` normalmente — si Django llega a renderizarlo, el contexto (usuario, sidebar) está disponible. `500.html` es un archivo HTML independiente sin herencia de templates: si el error ocurre durante la inicialización del contexto de Django (por ejemplo, una falla en la base de datos), extender `base.html` también fallaría y Django mostraría su página de error genérica en lugar de la personalizada.
+
 ### non_field_errors no renderizados
 
 Los errores de `unique_together` en Django van a `form.non_field_errors`, no a los errores de campo individuales. Los templates de departamentos solo renderizaban `field.errors`, por lo que el error "ya existe un departamento con ese número en este consorcio" no aparecía en pantalla aunque la validación funcionara correctamente.
