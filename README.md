@@ -192,9 +192,12 @@ python manage.py runserver
 - Retirar permisos a consorcistas
 - Cargar y gestionar gastos del consorcio por período y proveedor
 - Generar expensas con vista previa y cálculo automático
-- Ver y gestionar todas las expensas
-- Actualizar el estado de los reclamos
-- Crear y gestionar avisos por consorcio
+- Ver y gestionar todas las expensas con filtros por consorcio, período y departamento
+- Ver reclamos con filtros por consorcio y estado; actualizar estado de cada reclamo
+- Ver avisos con filtro por consorcio; crear y editar avisos por consorcio
+- Ver gastos con filtros por consorcio, proveedor y período
+- Ver departamentos con filtro por consorcio
+- Ver titularidades con filtros por consorcio y departamento
 
 ### Consorcista
 - Solicitar vinculación a un consorcio y departamento indicando su condición (dueño o inquilino)

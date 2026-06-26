@@ -61,6 +61,19 @@ git add . && git commit -m "mensaje" && git push tpfinal borrador
 | CRUD Titularidades (vistas custom, sin Django Admin) | OK |
 | CRUD Usuarios (vistas custom, sin Django Admin) | OK |
 | CRUD Perfiles (vistas custom, sin Django Admin) | OK |
+| Condición dueño/inquilino en solicitud y titularidad | OK |
+| Unique constraints: Consorcio.cuit, Proveedor.cuit, Departamento(consorcio+numero) | OK |
+| Signals post_save y post_delete en Pago → actualiza Expensa.pagada | OK |
+| Pagos parciales y crédito disponible en mis_expensas | OK |
+| Detalle de expensa con composición de gastos por departamento | OK |
+| Descarga / impresión de expensa en PDF (window.print) | OK |
+| Confirmación al crear titularidad con titular activo vigente | OK |
+| Filtros en listado de expensas (consorcio, período, departamento) | OK |
+| Filtros en listado de reclamos (consorcio, estado) | OK |
+| Filtros en listado de avisos (consorcio) | OK |
+| Filtros en listado de gastos (consorcio, proveedor, período) | OK |
+| Filtros en listado de departamentos (consorcio) | OK |
+| Filtros en listado de titularidades (consorcio, departamento) | OK |
 
 ## Apps del proyecto
 - core/        -> home, PanelAdminView, PanelConsorcistView
@@ -72,10 +85,9 @@ git add . && git commit -m "mensaje" && git push tpfinal borrador
 
 ## Estructura de selectors
 
-- consorcios/selectors.py -> get_departamento_por_usuario, get_titularidad_activa,
-                             get_departamento_por_titularidad, get_titular_en_periodo,
-                             get_solicitud_por_usuario, get_todas_las_solicitudes,
-                             get_solicitudes_pendientes,
+- consorcios/selectors.py -> get_titularidad_activa, get_departamento_por_titularidad,
+                             get_titular_en_periodo, get_solicitud_por_usuario,
+                             get_todas_las_solicitudes, get_solicitudes_pendientes,
                              get_titularidad_activa_por_departamento,
                              get_titularidades_activas_por_departamento,
                              get_todos_los_consorcios, get_todos_los_departamentos,
@@ -84,6 +96,7 @@ git add . && git commit -m "mensaje" && git push tpfinal borrador
                              get_expensa_por_id, get_gastos_por_consorcio_periodo,
                              calcular_monto_departamento, generar_preview_periodo,
                              get_resumen_gastos_periodo, get_pagos_por_expensa,
+                             get_detalle_gastos_por_expensa, get_credito_disponible,
                              get_todos_los_proveedores, get_todos_los_gastos
 - usuarios/selectors.py   -> get_perfil_por_usuario, get_todos_los_perfiles,
                              get_todos_los_usuarios
@@ -101,6 +114,7 @@ git add . && git commit -m "mensaje" && git push tpfinal borrador
 /panel-admin/                              -> PanelAdminView
 /panel-consorcista/                        -> PanelConsorcistView
 /mis-expensas/                             -> MisExpensasView
+/mis-expensas/<id>/                        -> DetalleExpensaConsorcistView
 /informar-pago/<id>/                       -> informar_pago
 /solicitud/                                -> CrearSolicitudView
 /solicitudes/                              -> ListarSolicitudesView
@@ -153,11 +167,12 @@ git add . && git commit -m "mensaje" && git push tpfinal borrador
 ```
 
 ## Pendientes
-- [ ] Página separada de confirmación para conflicto de titulares (UX mejorada)
+- Ninguno al momento
 
 ## Mejoras futuras
 - [ ] Dashboard con métricas reales en el panel admin
 - [ ] Notificaciones por email
-- [ ] Paginación y filtros en listados
+- [ ] Paginación en listados (filtros ya implementados)
 - [ ] API REST con Django REST Framework
 - [ ] Tests automatizados
+- [ ] Sistema de crédito automático entre períodos
