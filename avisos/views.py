@@ -4,7 +4,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import ListView, CreateView, UpdateView
 from django.urls import reverse_lazy
 
-from consorcios.selectors import get_departamento_por_titularidad, get_departamento_por_usuario
+from consorcios.selectors import get_departamento_por_titularidad
 from usuarios.mixins import RolRequeridoMixin
 from usuarios.selectors import get_perfil_por_usuario
 from .models import Aviso
@@ -50,8 +50,6 @@ class MisAvisosView(RolRequeridoMixin, ListView):
 
     def get_queryset(self):
         departamento = get_departamento_por_titularidad(self.request.user)
-        if not departamento:
-            departamento = get_departamento_por_usuario(self.request.user)
         if departamento:
             return get_avisos_activos_por_consorcio(departamento.consorcio)
         return Aviso.objects.none()

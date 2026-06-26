@@ -10,7 +10,7 @@ from consorcios.selectors import (
     get_titularidad_activa_por_departamento,
     get_titularidades_activas_por_departamento,
     get_departamento_por_titularidad,
-    get_departamento_por_usuario,
+
     get_solicitud_por_usuario,
     get_todas_las_solicitudes,
     get_todos_los_consorcios,
@@ -45,8 +45,6 @@ class MisExpensasView(RolRequeridoMixin, ListView):
 
     def get_queryset(self):
         departamento = get_departamento_por_titularidad(self.request.user)
-        if not departamento:
-            departamento = get_departamento_por_usuario(self.request.user)
         if departamento:
             return get_expensas_por_departamento(departamento)
         return Expensa.objects.none()
@@ -54,8 +52,6 @@ class MisExpensasView(RolRequeridoMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         departamento = get_departamento_por_titularidad(self.request.user)
-        if not departamento:
-            departamento = get_departamento_por_usuario(self.request.user)
         context['departamento'] = departamento
         credito_restante = get_credito_disponible(departamento) if departamento else 0
         expensas_con_pagos = []

@@ -2,9 +2,6 @@ from django.utils import timezone
 from .models import Departamento, Titularidad, SolicitudVinculacion
 
 
-def get_departamento_por_usuario(usuario):
-    return Departamento.objects.filter(usuario=usuario).first()
-
 
 def get_titularidad_activa(usuario):
     hoy = timezone.now().date()

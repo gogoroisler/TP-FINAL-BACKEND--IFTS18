@@ -4,7 +4,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import ListView, CreateView
 from django.urls import reverse_lazy
 
-from consorcios.selectors import get_departamento_por_titularidad, get_departamento_por_usuario
+from consorcios.selectors import get_departamento_por_titularidad
 from usuarios.mixins import RolRequeridoMixin
 from usuarios.selectors import get_perfil_por_usuario
 from .models import Reclamo
@@ -21,8 +21,6 @@ class CrearReclamoView(RolRequeridoMixin, CreateView):
 
     def form_valid(self, form):
         departamento = get_departamento_por_titularidad(self.request.user)
-        if not departamento:
-            departamento = get_departamento_por_usuario(self.request.user)
         if not departamento:
             form.add_error(None, 'No tenés un departamento asignado. Solicitá vinculación antes de crear un reclamo.')
             return self.form_invalid(form)
