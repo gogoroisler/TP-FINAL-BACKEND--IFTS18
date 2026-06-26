@@ -42,9 +42,15 @@ class SolicitudVinculacion(models.Model):
         ('rechazada', 'Rechazada'),
     ]
 
+    CONDICION_CHOICES = [
+        ('dueno', 'Dueño'),
+        ('inquilino', 'Inquilino'),
+    ]
+
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     consorcio = models.ForeignKey(Consorcio, on_delete=models.CASCADE)
     departamento = models.ForeignKey(Departamento, on_delete=models.CASCADE)
+    condicion = models.CharField(max_length=20, choices=CONDICION_CHOICES, default='dueno')
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')
     fecha = models.DateTimeField(auto_now_add=True)
     nota_admin = models.CharField(max_length=200, blank=True)

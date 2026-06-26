@@ -72,7 +72,7 @@ class CrearSolicitudView(RolRequeridoMixin, CreateView):
     rol_requerido = 'consorcista'
     model = SolicitudVinculacion
     template_name = 'crear_solicitud.html'
-    fields = ['consorcio', 'departamento']
+    fields = ['consorcio', 'departamento', 'condicion']
     success_url = reverse_lazy('mis_expensas')
 
     def dispatch(self, request, *args, **kwargs):

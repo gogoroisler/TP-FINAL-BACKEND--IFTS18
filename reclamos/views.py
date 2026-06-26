@@ -23,6 +23,9 @@ class CrearReclamoView(RolRequeridoMixin, CreateView):
         departamento = get_departamento_por_titularidad(self.request.user)
         if not departamento:
             departamento = get_departamento_por_usuario(self.request.user)
+        if not departamento:
+            form.add_error(None, 'No tenés un departamento asignado. Solicitá vinculación antes de crear un reclamo.')
+            return self.form_invalid(form)
         form.instance.usuario = self.request.user
         form.instance.departamento = departamento
         return super().form_valid(form)

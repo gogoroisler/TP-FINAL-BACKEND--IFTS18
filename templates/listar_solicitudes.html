@@ -20,6 +20,7 @@
                 <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Usuario</th>
                 <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Consorcio</th>
                 <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Departamento</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Condición</th>
                 <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Estado</th>
                 <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Fecha</th>
                 <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Acción</th>
@@ -31,6 +32,13 @@
                 <td class="px-4 py-3 text-sm text-slate-800">{{ solicitud.usuario }}</td>
                 <td class="px-4 py-3 text-sm text-slate-800">{{ solicitud.consorcio }}</td>
                 <td class="px-4 py-3 text-sm text-slate-800">{{ solicitud.departamento }}</td>
+                <td class="px-4 py-3">
+                    {% if solicitud.condicion == 'dueno' %}
+                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-violet-100 text-violet-700">Dueño</span>
+                    {% else %}
+                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">Inquilino</span>
+                    {% endif %}
+                </td>
                 <td class="px-4 py-3">
                     {% if solicitud.estado == 'pendiente' %}
                         <span class="px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">{{ solicitud.get_estado_display }}</span>
