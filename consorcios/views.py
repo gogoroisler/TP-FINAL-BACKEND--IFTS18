@@ -113,8 +113,6 @@ def informar_pago(request, expensa_id):
         monto = request.POST.get('monto', expensa.monto)
         nota = request.POST.get('nota', '')
         Pago.objects.create(expensa=expensa, monto=monto, nota=nota)
-        expensa.pagada = True
-        expensa.save()
     return redirect('mis_expensas')
 
 

@@ -71,6 +71,11 @@ class Expensa(models.Model):
     publicada = models.BooleanField(default=False)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def saldo_pendiente(self):
+        total_pagado = self.pagos.aggregate(total=models.Sum('monto'))['total'] or 0
+        return self.monto - total_pagado
+
     def __str__(self):
         return f'{self.departamento} - {self.periodo}'
 
