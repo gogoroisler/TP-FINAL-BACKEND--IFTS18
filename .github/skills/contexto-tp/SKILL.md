@@ -139,6 +139,7 @@ Archivo de URLs: `gestion_consorcios/urls.py`
 get_departamento_por_titularidad(usuario)   # depto activo del consorcista
 get_titularidad_activa_por_departamento(departamento)
 get_titularidades_activas_por_departamento(departamento)
+get_titularidades_activas_por_usuario(usuario)  # todas las titularidades activas del usuario (select_related depto__consorcio)
 get_todos_los_consorcios()
 get_todos_los_departamentos()
 get_todas_las_titularidades()
@@ -147,8 +148,10 @@ get_solicitud_por_usuario(usuario)
 
 # expensas/selectors.py
 get_expensas_por_departamento(departamento)
+get_todas_las_expensas()                    # con select_related depto__consorcio, order_by -periodo
 get_pagos_por_expensa(expensa)
-get_credito_disponible(departamento)        # suma saldos negativos de expensas
+get_credito_disponible(departamento)        # suma saldos negativos de expensas impagas
+get_detalle_gastos_por_expensa(expensa)     # devuelve {'detalle': [...], 'total_consorcio': Decimal}
 get_todos_los_proveedores()
 get_todos_los_gastos()
 
@@ -184,15 +187,20 @@ expensas: 0001→0003
 - Confirmación al crear Titularidad con conflicto (dos pasos)
 - Unique constraints: Consorcio.cuit, Proveedor.cuit, Departamento(consorcio+numero)
 - Error reclamo sin departamento: mensaje amigable, no 500
+- Detalle de expensa para el consorcista (`/mis-expensas/<id>/`): composición de gastos del período con contribución por departamento, historial de pagos, botón imprimir/PDF (window.print + @media print)
+- Filtros GET en todos los listados del admin: expensas (consorcio/período/departamento), reclamos (consorcio/estado), avisos (consorcio), gastos (consorcio/proveedor/período), departamentos (consorcio), titularidades (consorcio/departamento con dropdown cascading via onchange)
+- Listado de usuarios con columna "Vinculaciones activas" (Prefetch con to_attr) y filtros por rol, consorcio y departamento
+- Documentación completa: README.md, ROADMAP.md, DECISIONES.md (arquitectura, modelo, lógica, bugs, filtros, uso de IA)
 
 ## Lo que falta (ver ROADMAP.md)
 
 - Notificaciones por email
 - Reclamos con comentarios y categorías
 - Dashboard con métricas reales
-- Reportes exportables (PDF/Excel)
-- Paginación y filtros en listados
+- Reportes exportables para el admin (PDF/Excel)
+- Paginación en listados
 - Registro de auditoría
 - API REST
 - Tests automatizados
 - Sistema de crédito automático entre períodos (hoy se muestra pero no se descuenta al generar)
+- Múltiples vinculaciones y desvinculación por el consorcista
