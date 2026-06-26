@@ -10,6 +10,27 @@
     </a>
 </div>
 
+<!-- Filtro por departamento -->
+<form method="get" class="mb-6 flex items-center gap-3">
+    <select name="departamento_id"
+            class="border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+        <option value="">Todos los departamentos</option>
+        {% for depto in departamentos %}
+            <option value="{{ depto.id }}" {% if departamento_id_seleccionado == depto.id|stringformat:"s" %}selected{% endif %}>
+                {{ depto }}
+            </option>
+        {% endfor %}
+    </select>
+    <button type="submit"
+            class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-md font-medium transition-colors text-sm">
+        Filtrar
+    </button>
+    {% if departamento_id_seleccionado %}
+    <a href="{% url 'listar_titularidades' %}"
+       class="text-sm text-slate-500 hover:text-slate-700">Limpiar filtro</a>
+    {% endif %}
+</form>
+
 {% if titularidades %}
 <div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
     <table class="w-full">
@@ -17,6 +38,7 @@
             <tr>
                 <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Departamento</th>
                 <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Usuario</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Condición</th>
                 <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Desde</th>
                 <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Hasta</th>
                 <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Estado</th>
@@ -28,11 +50,18 @@
             <tr class="hover:bg-slate-50">
                 <td class="px-4 py-3 text-sm font-medium text-slate-800">{{ t.departamento }}</td>
                 <td class="px-4 py-3 text-sm text-slate-600">{{ t.usuario.username }}</td>
+                <td class="px-4 py-3">
+                    {% if t.condicion == 'dueno' %}
+                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-violet-100 text-violet-700">Dueño</span>
+                    {% else %}
+                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">Inquilino</span>
+                    {% endif %}
+                </td>
                 <td class="px-4 py-3 text-sm text-slate-600">{{ t.fecha_desde }}</td>
                 <td class="px-4 py-3 text-sm text-slate-600">{{ t.fecha_hasta|default:"—" }}</td>
                 <td class="px-4 py-3">
                     {% if t.fecha_hasta is None %}
-                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Activa</span>
+                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Vigente</span>
                     {% else %}
                         <span class="px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-500">Finalizada</span>
                     {% endif %}
@@ -48,7 +77,7 @@
 </div>
 {% else %}
 <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-12 text-center">
-    <p class="text-slate-500">No hay titularidades registradas.</p>
+    <p class="text-slate-500">No hay titularidades{% if departamento_id_seleccionado %} para el departamento seleccionado{% endif %}.</p>
 </div>
 {% endif %}
 

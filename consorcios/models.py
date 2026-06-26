@@ -29,8 +29,14 @@ class Departamento(models.Model):
 
 
 class Titularidad(models.Model):
+    CONDICION_CHOICES = [
+        ('dueno', 'Dueño'),
+        ('inquilino', 'Inquilino'),
+    ]
+
     departamento = models.ForeignKey(Departamento, on_delete=models.CASCADE)
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    condicion = models.CharField(max_length=20, choices=CONDICION_CHOICES, default='dueno')
     fecha_desde = models.DateField()
     fecha_hasta = models.DateField(null=True, blank=True)
 

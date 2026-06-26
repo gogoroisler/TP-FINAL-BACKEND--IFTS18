@@ -156,6 +156,7 @@ def gestionar_solicitud(request, solicitud_id):
             Titularidad.objects.create(
                 departamento=solicitud.departamento,
                 usuario=solicitud.usuario,
+                condicion=solicitud.condicion,
                 fecha_desde=timezone.now().date(),
             )
         elif accion == 'aprobar_reemplazar':
@@ -170,6 +171,7 @@ def gestionar_solicitud(request, solicitud_id):
             Titularidad.objects.create(
                 departamento=solicitud.departamento,
                 usuario=solicitud.usuario,
+                condicion=solicitud.condicion,
                 fecha_desde=timezone.now().date(),
             )
         elif accion == 'aprobar_agregar':
@@ -180,6 +182,7 @@ def gestionar_solicitud(request, solicitud_id):
             Titularidad.objects.create(
                 departamento=solicitud.departamento,
                 usuario=solicitud.usuario,
+                condicion=solicitud.condicion,
                 fecha_desde=timezone.now().date(),
             )
         elif accion == 'rechazar':
@@ -275,7 +278,17 @@ class ListarTitularidadesView(RolRequeridoMixin, ListView):
     context_object_name = 'titularidades'
 
     def get_queryset(self):
-        return get_todas_las_titularidades()
+        qs = get_todas_las_titularidades()
+        departamento_id = self.request.GET.get('departamento_id')
+        if departamento_id:
+            qs = qs.filter(departamento_id=departamento_id)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['departamentos'] = get_todos_los_departamentos()
+        context['departamento_id_seleccionado'] = self.request.GET.get('departamento_id', '')
+        return context
 
 
 @method_decorator(login_required, name='dispatch')
@@ -283,8 +296,19 @@ class CrearTitularidadView(RolRequeridoMixin, CreateView):
     rol_requerido = 'admin'
     model = Titularidad
     template_name = 'titularidades/crear.html'
-    fields = ['departamento', 'usuario', 'fecha_desde', 'fecha_hasta']
+    fields = ['departamento', 'usuario', 'condicion', 'fecha_desde', 'fecha_hasta']
     success_url = reverse_lazy('listar_titularidades')
+
+    def form_valid(self, form):
+        departamento = form.cleaned_data['departamento']
+        titular_activo = get_titularidad_activa_por_departamento(departamento)
+        if titular_activo and not self.request.POST.get('confirmado'):
+            return render(self.request, 'titularidades/confirmar_crear.html', {
+                'form': form,
+                'titular_activo': titular_activo,
+                'departamento': departamento,
+            })
+        return super().form_valid(form)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -292,7 +316,7 @@ class EditarTitularidadView(RolRequeridoMixin, UpdateView):
     rol_requerido = 'admin'
     model = Titularidad
     template_name = 'titularidades/editar.html'
-    fields = ['departamento', 'usuario', 'fecha_desde', 'fecha_hasta']
+    fields = ['departamento', 'usuario', 'condicion', 'fecha_desde', 'fecha_hasta']
     success_url = reverse_lazy('listar_titularidades')
     pk_url_kwarg = 'titularidad_id'
 

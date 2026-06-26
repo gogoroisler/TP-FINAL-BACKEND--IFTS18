@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Confirmar nueva titularidad{% endblock %}
+{% block content %}
+
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-800">Confirmar nueva titularidad</h1>
+</div>
+
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm p-6 max-w-lg">
+    <div class="flex items-start gap-3 mb-6">
+        <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+        </div>
+        <div>
+            <p class="text-slate-800 font-medium">{{ departamento }} ya tiene un titular vigente</p>
+            <p class="text-slate-600 text-sm mt-1">
+                <strong>{{ titular_activo.usuario.username }}</strong>
+                —
+                {% if titular_activo.condicion == 'dueno' %}Dueño{% else %}Inquilino{% endif %}
+                desde {{ titular_activo.fecha_desde }}
+            </p>
+            <p class="text-slate-500 text-sm mt-2">Si confirmás, el nuevo titular va a convivir con el actual. Si querés reemplazarlo, cerrá primero la titularidad vigente desde la lista.</p>
+        </div>
+    </div>
+
+    <form method="post" action="{% url 'crear_titularidad' %}">
+        {% csrf_token %}
+        {% for field in form %}
+            <input type="hidden" name="{{ field.html_name }}" value="{{ field.value|default:'' }}">
+        {% endfor %}
+        <input type="hidden" name="confirmado" value="1">
+        <div class="flex gap-3">
+            <button type="submit"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md font-medium transition-colors text-sm">
+                Confirmar de todas formas
+            </button>
+            <a href="{% url 'crear_titularidad' %}"
+               class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-4 py-2 rounded-md font-medium transition-colors text-sm">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
