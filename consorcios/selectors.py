@@ -2,9 +2,6 @@ from django.utils import timezone
 from .models import Departamento, Titularidad, SolicitudVinculacion
 
 
-def get_departamento_por_usuario(usuario):
-    return Departamento.objects.filter(usuario=usuario).first()
-
 
 def get_titularidad_activa(usuario):
     hoy = timezone.now().date()
@@ -56,3 +53,23 @@ def get_titularidades_activas_por_departamento(departamento):
         departamento=departamento,
         fecha_hasta__isnull=True
     )
+
+
+def get_titularidades_activas_por_usuario(usuario):
+    return Titularidad.objects.filter(
+        usuario=usuario,
+        fecha_hasta__isnull=True
+    ).select_related('departamento__consorcio')
+
+
+def get_todos_los_consorcios():
+    from .models import Consorcio
+    return Consorcio.objects.all().order_by('nombre')
+
+
+def get_todos_los_departamentos():
+    return Departamento.objects.all().order_by('consorcio', 'numero')
+
+
+def get_todas_las_titularidades():
+    return Titularidad.objects.all().select_related('departamento', 'usuario').order_by('departamento__consorcio', 'departamento__numero')

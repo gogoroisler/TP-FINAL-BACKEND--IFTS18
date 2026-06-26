@@ -6,7 +6,7 @@ def get_reclamos_por_usuario(usuario):
 
 
 def get_todos_los_reclamos():
-    return Reclamo.objects.all().order_by('-fecha_creacion')
+    return Reclamo.objects.select_related('departamento__consorcio', 'usuario').order_by('-fecha_creacion')
 
 
 def get_reclamo_por_id(reclamo_id):

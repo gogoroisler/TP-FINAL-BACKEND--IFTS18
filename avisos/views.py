@@ -4,7 +4,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import ListView, CreateView, UpdateView
 from django.urls import reverse_lazy
 
-from consorcios.selectors import get_departamento_por_titularidad, get_departamento_por_usuario
+from consorcios.selectors import get_departamento_por_titularidad, get_todos_los_consorcios
 from usuarios.mixins import RolRequeridoMixin
 from usuarios.selectors import get_perfil_por_usuario
 from .models import Aviso
@@ -19,7 +19,17 @@ class ListarAvisosAdminView(RolRequeridoMixin, ListView):
     context_object_name = 'avisos'
 
     def get_queryset(self):
-        return get_todos_los_avisos()
+        qs = get_todos_los_avisos()
+        consorcio_id = self.request.GET.get('consorcio_id')
+        if consorcio_id:
+            qs = qs.filter(consorcio_id=consorcio_id)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['consorcios'] = get_todos_los_consorcios()
+        context['consorcio_id_seleccionado'] = self.request.GET.get('consorcio_id', '')
+        return context
 
 
 @method_decorator(login_required, name='dispatch')
@@ -50,8 +60,6 @@ class MisAvisosView(RolRequeridoMixin, ListView):
 
     def get_queryset(self):
         departamento = get_departamento_por_titularidad(self.request.user)
-        if not departamento:
-            departamento = get_departamento_por_usuario(self.request.user)
         if departamento:
             return get_avisos_activos_por_consorcio(departamento.consorcio)
         return Aviso.objects.none()

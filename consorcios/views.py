@@ -2,20 +2,23 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.urls import reverse_lazy
 
-from consorcios.models import Consorcio, Titularidad, SolicitudVinculacion
+from consorcios.models import Consorcio, Departamento, Titularidad, SolicitudVinculacion
 from consorcios.selectors import (
     get_titularidad_activa_por_departamento,
     get_titularidades_activas_por_departamento,
     get_departamento_por_titularidad,
-    get_departamento_por_usuario,
+
     get_solicitud_por_usuario,
     get_todas_las_solicitudes,
+    get_todos_los_consorcios,
+    get_todos_los_departamentos,
+    get_todas_las_titularidades,
 )
 from expensas.models import Expensa
-from expensas.selectors import get_expensas_por_departamento, get_pagos_por_expensa
+from expensas.selectors import get_expensas_por_departamento, get_pagos_por_expensa, get_credito_disponible, get_detalle_gastos_por_expensa
 from usuarios.mixins import RolRequeridoMixin
 from usuarios.selectors import get_perfil_por_usuario
 
@@ -42,8 +45,6 @@ class MisExpensasView(RolRequeridoMixin, ListView):
 
     def get_queryset(self):
         departamento = get_departamento_por_titularidad(self.request.user)
-        if not departamento:
-            departamento = get_departamento_por_usuario(self.request.user)
         if departamento:
             return get_expensas_por_departamento(departamento)
         return Expensa.objects.none()
@@ -51,16 +52,47 @@ class MisExpensasView(RolRequeridoMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         departamento = get_departamento_por_titularidad(self.request.user)
-        if not departamento:
-            departamento = get_departamento_por_usuario(self.request.user)
         context['departamento'] = departamento
+        credito_restante = get_credito_disponible(departamento) if departamento else 0
         expensas_con_pagos = []
         for expensa in context['expensas']:
+            saldo = expensa.saldo_pendiente
+            if saldo > 0 and credito_restante > 0:
+                credito_aplicado = min(credito_restante, saldo)
+                credito_restante -= credito_aplicado
+                monto_a_pagar = saldo - credito_aplicado
+            else:
+                credito_aplicado = 0
+                monto_a_pagar = max(saldo, 0)
             expensas_con_pagos.append({
                 'expensa': expensa,
                 'pagos': get_pagos_por_expensa(expensa),
+                'credito_aplicado': credito_aplicado,
+                'monto_a_pagar': monto_a_pagar,
             })
         context['expensas_con_pagos'] = expensas_con_pagos
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class DetalleExpensaConsorcistView(RolRequeridoMixin, DetailView):
+    rol_requerido = 'consorcista'
+    model = Expensa
+    template_name = 'detalle_expensa_consorcista.html'
+    context_object_name = 'expensa'
+    pk_url_kwarg = 'expensa_id'
+
+    def get_queryset(self):
+        departamento = get_departamento_por_titularidad(self.request.user)
+        if departamento is None:
+            return Expensa.objects.none()
+        return Expensa.objects.filter(departamento=departamento, publicada=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        expensa = self.object
+        context['pagos'] = get_pagos_por_expensa(expensa)
+        context['detalle_gastos'] = get_detalle_gastos_por_expensa(expensa)
         return context
 
 
@@ -69,7 +101,7 @@ class CrearSolicitudView(RolRequeridoMixin, CreateView):
     rol_requerido = 'consorcista'
     model = SolicitudVinculacion
     template_name = 'crear_solicitud.html'
-    fields = ['consorcio', 'departamento']
+    fields = ['departamento', 'condicion']
     success_url = reverse_lazy('mis_expensas')
 
     def dispatch(self, request, *args, **kwargs):
@@ -79,12 +111,12 @@ class CrearSolicitudView(RolRequeridoMixin, CreateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        # Borra solicitud rechazada anterior si existe
         SolicitudVinculacion.objects.filter(
             usuario=self.request.user,
             estado='rechazada'
         ).delete()
         form.instance.usuario = self.request.user
+        form.instance.consorcio = form.cleaned_data['departamento'].consorcio
         return super().form_valid(form)
 
 
@@ -110,8 +142,6 @@ def informar_pago(request, expensa_id):
         monto = request.POST.get('monto', expensa.monto)
         nota = request.POST.get('nota', '')
         Pago.objects.create(expensa=expensa, monto=monto, nota=nota)
-        expensa.pagada = True
-        expensa.save()
     return redirect('mis_expensas')
 
 
@@ -144,6 +174,7 @@ def gestionar_solicitud(request, solicitud_id):
             Titularidad.objects.create(
                 departamento=solicitud.departamento,
                 usuario=solicitud.usuario,
+                condicion=solicitud.condicion,
                 fecha_desde=timezone.now().date(),
             )
         elif accion == 'aprobar_reemplazar':
@@ -158,6 +189,7 @@ def gestionar_solicitud(request, solicitud_id):
             Titularidad.objects.create(
                 departamento=solicitud.departamento,
                 usuario=solicitud.usuario,
+                condicion=solicitud.condicion,
                 fecha_desde=timezone.now().date(),
             )
         elif accion == 'aprobar_agregar':
@@ -168,6 +200,7 @@ def gestionar_solicitud(request, solicitud_id):
             Titularidad.objects.create(
                 departamento=solicitud.departamento,
                 usuario=solicitud.usuario,
+                condicion=solicitud.condicion,
                 fecha_desde=timezone.now().date(),
             )
         elif accion == 'rechazar':
@@ -175,6 +208,164 @@ def gestionar_solicitud(request, solicitud_id):
             solicitud.nota_admin = nota_admin
             solicitud.save()
     return redirect('listar_solicitudes')
+
+
+@method_decorator(login_required, name='dispatch')
+class ListarConsorciosView(RolRequeridoMixin, ListView):
+    rol_requerido = 'admin'
+    model = Consorcio
+    template_name = 'consorcios/listar.html'
+    context_object_name = 'consorcios'
+
+    def get_queryset(self):
+        return get_todos_los_consorcios()
+
+
+@method_decorator(login_required, name='dispatch')
+class CrearConsorcioView(RolRequeridoMixin, CreateView):
+    rol_requerido = 'admin'
+    model = Consorcio
+    template_name = 'consorcios/crear.html'
+    fields = ['nombre', 'direccion', 'cuit', 'telefono', 'email']
+    success_url = reverse_lazy('listar_consorcios')
+
+
+@method_decorator(login_required, name='dispatch')
+class EditarConsorcioView(RolRequeridoMixin, UpdateView):
+    rol_requerido = 'admin'
+    model = Consorcio
+    template_name = 'consorcios/editar.html'
+    fields = ['nombre', 'direccion', 'cuit', 'telefono', 'email']
+    success_url = reverse_lazy('listar_consorcios')
+    pk_url_kwarg = 'consorcio_id'
+
+
+@method_decorator(login_required, name='dispatch')
+class EliminarConsorcioView(RolRequeridoMixin, DeleteView):
+    rol_requerido = 'admin'
+    model = Consorcio
+    template_name = 'consorcios/eliminar.html'
+    success_url = reverse_lazy('listar_consorcios')
+    pk_url_kwarg = 'consorcio_id'
+
+
+@method_decorator(login_required, name='dispatch')
+class ListarDepartamentosView(RolRequeridoMixin, ListView):
+    rol_requerido = 'admin'
+    model = Departamento
+    template_name = 'departamentos/listar.html'
+    context_object_name = 'departamentos'
+
+    def get_queryset(self):
+        qs = get_todos_los_departamentos()
+        consorcio_id = self.request.GET.get('consorcio_id')
+        if consorcio_id:
+            qs = qs.filter(consorcio_id=consorcio_id)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['consorcios'] = get_todos_los_consorcios()
+        context['consorcio_id_seleccionado'] = self.request.GET.get('consorcio_id', '')
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class CrearDepartamentoView(RolRequeridoMixin, CreateView):
+    rol_requerido = 'admin'
+    model = Departamento
+    template_name = 'departamentos/crear.html'
+    fields = ['consorcio', 'numero', 'piso', 'propietario', 'metros_cuadrados']
+    success_url = reverse_lazy('listar_departamentos')
+
+
+@method_decorator(login_required, name='dispatch')
+class EditarDepartamentoView(RolRequeridoMixin, UpdateView):
+    rol_requerido = 'admin'
+    model = Departamento
+    template_name = 'departamentos/editar.html'
+    fields = ['consorcio', 'numero', 'piso', 'propietario', 'metros_cuadrados']
+    success_url = reverse_lazy('listar_departamentos')
+    pk_url_kwarg = 'departamento_id'
+
+
+@method_decorator(login_required, name='dispatch')
+class EliminarDepartamentoView(RolRequeridoMixin, DeleteView):
+    rol_requerido = 'admin'
+    model = Departamento
+    template_name = 'departamentos/eliminar.html'
+    success_url = reverse_lazy('listar_departamentos')
+    pk_url_kwarg = 'departamento_id'
+
+
+@method_decorator(login_required, name='dispatch')
+class ListarTitularidadesView(RolRequeridoMixin, ListView):
+    rol_requerido = 'admin'
+    model = Titularidad
+    template_name = 'titularidades/listar.html'
+    context_object_name = 'titularidades'
+
+    def get_queryset(self):
+        qs = get_todas_las_titularidades()
+        consorcio_id = self.request.GET.get('consorcio_id')
+        departamento_id = self.request.GET.get('departamento_id')
+        if consorcio_id:
+            qs = qs.filter(departamento__consorcio_id=consorcio_id)
+        if departamento_id:
+            qs = qs.filter(departamento_id=departamento_id)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        consorcio_id = self.request.GET.get('consorcio_id', '')
+        context['consorcios'] = get_todos_los_consorcios()
+        context['departamentos'] = (
+            Departamento.objects.filter(consorcio_id=consorcio_id).order_by('numero')
+            if consorcio_id
+            else get_todos_los_departamentos()
+        )
+        context['consorcio_id_seleccionado'] = consorcio_id
+        context['departamento_id_seleccionado'] = self.request.GET.get('departamento_id', '')
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class CrearTitularidadView(RolRequeridoMixin, CreateView):
+    rol_requerido = 'admin'
+    model = Titularidad
+    template_name = 'titularidades/crear.html'
+    fields = ['departamento', 'usuario', 'condicion', 'fecha_desde', 'fecha_hasta']
+    success_url = reverse_lazy('listar_titularidades')
+
+    def form_valid(self, form):
+        departamento = form.cleaned_data['departamento']
+        titular_activo = get_titularidad_activa_por_departamento(departamento)
+        if titular_activo and not self.request.POST.get('confirmado'):
+            return render(self.request, 'titularidades/confirmar_crear.html', {
+                'form': form,
+                'titular_activo': titular_activo,
+                'departamento': departamento,
+            })
+        return super().form_valid(form)
+
+
+@method_decorator(login_required, name='dispatch')
+class EditarTitularidadView(RolRequeridoMixin, UpdateView):
+    rol_requerido = 'admin'
+    model = Titularidad
+    template_name = 'titularidades/editar.html'
+    fields = ['departamento', 'usuario', 'condicion', 'fecha_desde', 'fecha_hasta']
+    success_url = reverse_lazy('listar_titularidades')
+    pk_url_kwarg = 'titularidad_id'
+
+
+@method_decorator(login_required, name='dispatch')
+class EliminarTitularidadView(RolRequeridoMixin, DeleteView):
+    rol_requerido = 'admin'
+    model = Titularidad
+    template_name = 'titularidades/eliminar.html'
+    success_url = reverse_lazy('listar_titularidades')
+    pk_url_kwarg = 'titularidad_id'
 
 
 @login_required

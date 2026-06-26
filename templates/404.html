@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Página no encontrada{% endblock %}
+{% block content %}
+
+<div class="flex flex-col items-center justify-center py-24 text-center">
+    <p class="text-7xl font-bold text-slate-200 mb-4">404</p>
+    <h1 class="text-2xl font-bold text-slate-800 mb-2">Página no encontrada</h1>
+    <p class="text-slate-500 mb-8">La página que buscás no existe o fue movida.</p>
+    <a href="/"
+       class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-md font-medium transition-colors text-sm">
+        Volver al inicio
+    </a>
+</div>
+
+{% endblock %}

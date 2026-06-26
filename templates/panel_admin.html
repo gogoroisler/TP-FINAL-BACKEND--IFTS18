@@ -79,7 +79,7 @@
         </div>
     </div>
 
-    <!-- Gastos (Django Admin) -->
+    <!-- Gastos -->
     <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-6">
         <div class="flex items-center gap-3 mb-4">
             <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
@@ -90,11 +90,11 @@
             <h2 class="text-base font-semibold text-slate-800">Gastos</h2>
         </div>
         <div class="space-y-2">
-            <a href="/admin/expensas/gastoconsorcio/add/"
+            <a href="{% url 'crear_gasto' %}"
                class="block text-sm text-emerald-600 hover:text-emerald-700 font-medium">Cargar gasto del consorcio →</a>
-            <a href="/admin/expensas/gastoconsorcio/"
+            <a href="{% url 'listar_gastos' %}"
                class="block text-sm text-emerald-600 hover:text-emerald-700 font-medium">Ver todos los gastos →</a>
-            <a href="/admin/expensas/proveedor/"
+            <a href="{% url 'listar_proveedores' %}"
                class="block text-sm text-emerald-600 hover:text-emerald-700 font-medium">Gestionar proveedores →</a>
         </div>
     </div>
@@ -110,15 +110,15 @@
             <h2 class="text-base font-semibold text-slate-800">Consorcios y departamentos</h2>
         </div>
         <div class="space-y-2">
-            <a href="/admin/consorcios/consorcio/"
+            <a href="{% url 'listar_consorcios' %}"
                class="block text-sm text-emerald-600 hover:text-emerald-700 font-medium">Gestionar consorcios →</a>
-            <a href="/admin/consorcios/departamento/"
+            <a href="{% url 'listar_departamentos' %}"
                class="block text-sm text-emerald-600 hover:text-emerald-700 font-medium">Gestionar departamentos →</a>
-            <a href="/admin/consorcios/titularidad/"
+            <a href="{% url 'listar_titularidades' %}"
                class="block text-sm text-emerald-600 hover:text-emerald-700 font-medium">Gestionar titularidades →</a>
-            <a href="/admin/auth/user/"
+            <a href="{% url 'listar_usuarios' %}"
                class="block text-sm text-emerald-600 hover:text-emerald-700 font-medium">Gestionar usuarios →</a>
-            <a href="/admin/usuarios/perfil/"
+            <a href="{% url 'listar_perfiles' %}"
                class="block text-sm text-emerald-600 hover:text-emerald-700 font-medium">Gestionar perfiles →</a>
         </div>
     </div>

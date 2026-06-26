@@ -2,8 +2,8 @@
 
 ## Etapa 1 — Completar el núcleo de negocio
 
-**1. Expensas: estado de pago real**
-El modelo actual tiene `pagada` como booleano, pero ya permite pagos parciales. El campo debería calcularse automáticamente comparando la suma de pagos contra el monto total, y mostrar el saldo pendiente en la vista del consorcista.
+**1. ~~Expensas: estado de pago real~~ ✅ Implementado**
+`Expensa.pagada` se actualiza automáticamente vía signals de Django (`post_save` y `post_delete` en `Pago`). El saldo pendiente y el crédito por sobrepago se muestran en `/mis-expensas/`.
 
 **2. Notificaciones por email**
 Hoy no existe ningún canal de comunicación automática. Con el sistema de email de Django (sin librerías externas) se puede notificar al consorcista cuando su solicitud es aprobada/rechazada, cuando vence una expensa, o cuando cambia el estado de su reclamo.
@@ -18,11 +18,11 @@ El modelo actual es muy básico. Agregarle categorías (rotura, ruido, limpieza,
 **4. Dashboard con métricas**
 El panel admin hoy es solo links de navegación. Un dashboard real mostraría: total adeudado, expensas vencidas, reclamos sin resolver, solicitudes pendientes — todo con datos reales de la base de datos.
 
-**5. Reportes exportables**
-Listar expensas en pantalla está bien, pero el admin necesita exportar: estado de deuda por departamento, composición de gastos por período, listado de morosos. Formatos: PDF y/o Excel.
+**5. Reportes exportables para el administrador**
+El consorcista ya puede imprimir o descargar en PDF el detalle de su propia expensa. Lo que falta es del lado del admin: exportar el estado de deuda por departamento, la composición de gastos por período y el listado de morosos. Formatos: PDF y/o Excel.
 
-**6. Paginación y filtros en listados**
-Con pocos datos no se nota, pero listar expensas o reclamos sin paginar ni filtrar no escala. Django tiene paginación nativa y es trabajo menor.
+**6. ~~Filtros en listados~~ ✅ Implementado / Paginación pendiente**
+Filtros implementados en: expensas (consorcio, período, departamento), reclamos (consorcio, estado), avisos (consorcio), gastos (consorcio, proveedor, período), departamentos (consorcio), titularidades (consorcio, departamento). La paginación nativa de Django queda pendiente para cuando los volúmenes de datos lo requieran.
 
 **7. Registro de auditoría**
 Quién aprobó qué solicitud, quién cambió el estado de un reclamo, qué admin generó las expensas del período. Hoy no queda rastro de ninguna acción. Una app `auditoria` con signals de Django resuelve esto.
@@ -40,6 +40,20 @@ La lógica de cálculo de expensas (4 combinaciones de tipo/alcance/prorrateo) e
 **10. Docker + CI/CD**
 Para que el proyecto pueda desplegarse en cualquier servidor sin depender del ambiente local. GitHub Actions para correr los tests automáticamente en cada push.
 
+**13. Logging estructurado de errores**
+Hoy los errores de servidor (500) no dejan rastro registrado. Configurar el sistema de logging de Django para escribir errores a un archivo o servicio externo (Sentry, Logtail) permite diagnosticar problemas en producción sin acceso directo al servidor.
+
+**14. Protección ante volúmenes extremos de datos**
+Sin paginación ni límites en los querysets, un listado con miles de registros puede volverse lento o consumir memoria excesiva. Agregar paginación nativa de Django y limitar los querysets más pesados es la mitigación directa.
+
+---
+
+**11. Múltiples vinculaciones y desvinculación por el consorcista**
+Hoy un consorcista solo puede tener una vinculación activa a la vez. La mejora implicaría permitir que un consorcista solicite vinculación a más de un departamento simultáneamente (por ejemplo, si administra dos unidades), y que pueda solicitar su propia desvinculación sin necesidad de que el admin retire los permisos manualmente. Requiere refactorizar `MisExpensasView` para agrupar expensas por departamento y actualizar la lógica de solicitudes.
+
+**12. Sistema de crédito automático entre períodos**
+Hoy el crédito por sobrepago se muestra en la vista del consorcista pero no se aplica automáticamente al generar la expensa del próximo período. La mejora implicaría un campo `credito` en `Perfil` o un modelo `CreditoConsorcista` que acumule saldos a favor y los descuente al crear nuevas expensas, sin intervención del admin.
+
 ---
 
 ## Lo que está sólido y no se toca
@@ -48,3 +62,6 @@ Para que el proyecto pueda desplegarse en cualquier servidor sin depender del am
 - Flujo de vinculación con manejo de conflictos de titulares correctamente resuelto.
 - Cálculo de expensas con los 4 casos de prorrateo (ordinario/extraordinario × proporcional/igualitario).
 - Diseño con Tailwind CSS aplicado en todos los templates.
+- CRUD completo sin Django Admin: consorcios, departamentos, titularidades, proveedores, gastos, usuarios y perfiles tienen vistas propias con Tailwind.
+- Detalle de expensa por consorcista: composición de gastos del período con contribución por departamento y descarga en PDF.
+- Filtros en todos los listados del administrador (expensas, reclamos, avisos, gastos, departamentos, titularidades).

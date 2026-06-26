@@ -5,7 +5,7 @@ from .validators import validar_formato_periodo
 
 class Proveedor(models.Model):
     nombre = models.CharField(max_length=100)
-    cuit = models.CharField(max_length=20)
+    cuit = models.CharField(max_length=20, unique=True)
     rubro = models.CharField(max_length=100)
 
     def __str__(self):
@@ -70,6 +70,11 @@ class Expensa(models.Model):
     pagada = models.BooleanField(default=False)
     publicada = models.BooleanField(default=False)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def saldo_pendiente(self):
+        total_pagado = self.pagos.aggregate(total=models.Sum('monto'))['total'] or 0
+        return self.monto - total_pagado
 
     def __str__(self):
         return f'{self.departamento} - {self.periodo}'

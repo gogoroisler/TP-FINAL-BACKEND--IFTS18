@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% block title %}Usuarios{% endblock %}
+{% block content %}
+
+<div class="mb-6 flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-slate-800">Usuarios</h1>
+    <a href="{% url 'crear_usuario' %}"
+       class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md font-medium transition-colors text-sm">
+        + Nuevo usuario
+    </a>
+</div>
+
+{# Panel de filtros #}
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm p-4 mb-6">
+    <form method="get" class="flex flex-wrap items-end gap-4">
+        <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Rol</label>
+            <select name="rol"
+                    class="border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                <option value="">Todos</option>
+                <option value="admin" {% if rol_seleccionado == 'admin' %}selected{% endif %}>Administrador</option>
+                <option value="consorcista" {% if rol_seleccionado == 'consorcista' %}selected{% endif %}>Consorcista</option>
+                <option value="sin_perfil" {% if rol_seleccionado == 'sin_perfil' %}selected{% endif %}>Sin perfil</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Consorcio</label>
+            <select name="consorcio_id" onchange="this.form.submit()"
+                    class="border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                <option value="">Todos</option>
+                {% for consorcio in consorcios %}
+                <option value="{{ consorcio.id }}"
+                    {% if consorcio_id_seleccionado == consorcio.id|stringformat:"s" %}selected{% endif %}>
+                    {{ consorcio.nombre }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Departamento</label>
+            <select name="departamento_id"
+                    class="border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                <option value="">Todos</option>
+                {% for depto in departamentos %}
+                <option value="{{ depto.id }}"
+                    {% if departamento_id_seleccionado == depto.id|stringformat:"s" %}selected{% endif %}>
+                    {{ depto }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="flex gap-2">
+            <button type="submit"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md font-medium transition-colors text-sm">
+                Filtrar
+            </button>
+            {% if rol_seleccionado or consorcio_id_seleccionado or departamento_id_seleccionado %}
+            <a href="{% url 'listar_usuarios' %}"
+               class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-4 py-2 rounded-md font-medium transition-colors text-sm">
+                Limpiar
+            </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+{% if usuarios %}
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+    <div class="px-4 py-3 border-b border-slate-100 text-xs text-slate-500">
+        {{ usuarios|length }} resultado{% if usuarios|length != 1 %}s{% endif %}
+        {% if rol_seleccionado or consorcio_id_seleccionado or departamento_id_seleccionado %}— filtro activo{% endif %}
+    </div>
+    <table class="w-full">
+        <thead class="bg-slate-50 border-b border-slate-200">
+            <tr>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Username</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Nombre</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Email</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Rol</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Vinculaciones activas</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Activo</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+            {% for usuario in usuarios %}
+            <tr class="hover:bg-slate-50 align-top">
+                <td class="px-4 py-3 text-sm font-medium text-slate-800">{{ usuario.username }}</td>
+                <td class="px-4 py-3 text-sm text-slate-600">{{ usuario.get_full_name|default:"—" }}</td>
+                <td class="px-4 py-3 text-sm text-slate-600">{{ usuario.email|default:"—" }}</td>
+                <td class="px-4 py-3">
+                    {% if usuario.perfil.rol == 'admin' %}
+                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-violet-100 text-violet-700">Administrador</span>
+                    {% elif usuario.perfil.rol == 'consorcista' %}
+                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">Consorcista</span>
+                    {% else %}
+                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-600">Sin perfil</span>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm">
+                    {% if usuario.titularidades_activas %}
+                        <ul class="space-y-1">
+                        {% for t in usuario.titularidades_activas %}
+                            <li class="text-slate-700">
+                                <span class="font-medium">Dpto. {{ t.departamento.numero }}</span>
+                                <span class="text-slate-500">— {{ t.departamento.consorcio.nombre }}</span>
+                                <span class="ml-1 px-1.5 py-0.5 rounded text-xs
+                                    {% if t.condicion == 'dueno' %}bg-violet-100 text-violet-700{% else %}bg-slate-100 text-slate-600{% endif %}">
+                                    {% if t.condicion == 'dueno' %}Dueño{% else %}Inquilino{% endif %}
+                                </span>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <span class="text-slate-400">Sin vinculación</span>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3">
+                    {% if usuario.is_active %}
+                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Activo</span>
+                    {% else %}
+                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-600">Inactivo</span>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm flex items-center gap-3">
+                    <a href="{% url 'editar_usuario' usuario.id %}" class="text-slate-600 hover:text-slate-800 font-medium">Editar</a>
+                    <a href="{% url 'eliminar_usuario' usuario.id %}" class="text-red-600 hover:text-red-700 font-medium">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="bg-white border border-slate-200 rounded-lg shadow-sm p-12 text-center">
+    <p class="text-slate-500">
+        {% if rol_seleccionado or consorcio_id_seleccionado or departamento_id_seleccionado %}
+            No hay usuarios que coincidan con los filtros seleccionados.
+        {% else %}
+            No hay usuarios registrados.
+        {% endif %}
+    </p>
+</div>
+{% endif %}
+
+{% endblock %}

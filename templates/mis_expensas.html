@@ -21,11 +21,17 @@
         <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-6">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-base font-semibold text-slate-800">Período {{ item.expensa.periodo }}</h2>
-                {% if item.expensa.pagada %}
-                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Pagada</span>
-                {% else %}
-                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">Pendiente</span>
-                {% endif %}
+                <div class="flex items-center gap-3">
+                    {% if item.expensa.pagada %}
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Pagada</span>
+                    {% else %}
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">Pendiente</span>
+                    {% endif %}
+                    <a href="{% url 'detalle_expensa_consorcista' item.expensa.id %}"
+                       class="text-xs font-medium text-emerald-600 hover:text-emerald-800 underline">
+                        Ver detalle
+                    </a>
+                </div>
             </div>
 
             <dl class="grid grid-cols-2 gap-3 mb-4">
@@ -37,6 +43,16 @@
                     <dt class="text-xs text-slate-500">Vencimiento</dt>
                     <dd class="text-sm font-medium text-slate-800">{{ item.expensa.fecha_vencimiento }}</dd>
                 </div>
+                {% if item.credito_aplicado %}
+                <div>
+                    <dt class="text-xs text-slate-500">Crédito a favor</dt>
+                    <dd class="text-sm font-medium text-emerald-600">-${{ item.credito_aplicado }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-slate-500">A pagar</dt>
+                    <dd class="text-sm font-bold text-slate-800">${{ item.monto_a_pagar }}</dd>
+                </div>
+                {% endif %}
             </dl>
 
             {% if item.pagos %}

@@ -3,14 +3,14 @@ from .models import Expensa, GastoConsorcio
 
 
 def get_todas_las_expensas():
-    return Expensa.objects.all()
+    return Expensa.objects.select_related('departamento__consorcio').order_by('-periodo', 'departamento__consorcio__nombre', 'departamento__numero')
 
 
 def get_expensas_por_departamento(departamento):
     return Expensa.objects.filter(
         departamento=departamento,
         publicada=True
-    )
+    ).order_by('-periodo')
 
 
 def get_expensa_por_id(expensa_id):
@@ -102,6 +102,68 @@ def get_resumen_gastos_periodo(consorcio, periodo):
     }
 
 
+def get_detalle_gastos_por_expensa(expensa):
+    departamento = expensa.departamento
+    consorcio = departamento.consorcio
+    m2_depto = departamento.metros_cuadrados
+    gastos = get_gastos_por_consorcio_periodo(consorcio, expensa.periodo)
+    m2_totales = sum(d.metros_cuadrados for d in consorcio.departamento_set.all())
+
+    detalle = []
+    for gasto in gastos:
+        contribucion = Decimal('0')
+        if gasto.tipo == 'ordinario':
+            if m2_totales > 0:
+                contribucion = gasto.monto * (m2_depto / m2_totales)
+        elif gasto.tipo == 'extraordinario':
+            if gasto.alcance == 'general':
+                if m2_totales > 0:
+                    contribucion = gasto.monto * (m2_depto / m2_totales)
+            elif gasto.alcance == 'por_departamento':
+                deptos_involucrados = gasto.departamentos.all()
+                if departamento not in deptos_involucrados:
+                    continue
+                if gasto.prorrateo == 'igualitario':
+                    cantidad = deptos_involucrados.count()
+                    if cantidad > 0:
+                        contribucion = gasto.monto / cantidad
+                else:
+                    m2_involucrados = sum(d.metros_cuadrados for d in deptos_involucrados)
+                    if m2_involucrados > 0:
+                        contribucion = gasto.monto * (m2_depto / m2_involucrados)
+        detalle.append({
+            'gasto': gasto,
+            'contribucion': contribucion.quantize(Decimal('0.01')),
+        })
+
+    return {
+        'detalle': detalle,
+        'total_consorcio': sum(g.monto for g in gastos),
+    }
+
+
 def get_pagos_por_expensa(expensa):
     from .models import Pago
     return Pago.objects.filter(expensa=expensa).order_by('-fecha')
+
+
+def get_todos_los_proveedores():
+    from .models import Proveedor
+    return Proveedor.objects.all().order_by('nombre')
+
+
+def get_todos_los_gastos():
+    return GastoConsorcio.objects.all().order_by('-periodo')
+
+
+def get_credito_disponible(departamento):
+    expensas = Expensa.objects.filter(
+        departamento=departamento,
+        publicada=True,
+    ).prefetch_related('pagos')
+    credito = Decimal('0')
+    for expensa in expensas:
+        saldo = expensa.saldo_pendiente
+        if saldo < 0:
+            credito += abs(saldo)
+    return credito
