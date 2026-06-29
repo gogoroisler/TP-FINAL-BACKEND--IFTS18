@@ -2,6 +2,39 @@ from decimal import Decimal
 from .models import Expensa, GastoConsorcio
 
 
+class _ProporcionConsorcio:
+    def calcular(self, gasto, departamento, m2_depto, m2_totales):
+        if m2_totales > 0:
+            return gasto.monto * (m2_depto / m2_totales)
+        return Decimal('0')
+
+
+class _IgualitarioPorDepartamento:
+    def calcular(self, gasto, departamento, m2_depto, m2_totales):
+        deptos = gasto.departamentos.all()
+        if departamento not in deptos:
+            return None
+        cantidad = deptos.count()
+        return gasto.monto / cantidad if cantidad > 0 else Decimal('0')
+
+
+class _ProporcionalPorDepartamento:
+    def calcular(self, gasto, departamento, m2_depto, m2_totales):
+        deptos = gasto.departamentos.all()
+        if departamento not in deptos:
+            return None
+        m2_inv = sum(d.metros_cuadrados for d in deptos)
+        return gasto.monto * (m2_depto / m2_inv) if m2_inv > 0 else Decimal('0')
+
+
+def _estrategia_gasto(gasto):
+    if gasto.tipo == 'ordinario' or gasto.alcance == 'general':
+        return _ProporcionConsorcio()
+    if gasto.prorrateo == 'igualitario':
+        return _IgualitarioPorDepartamento()
+    return _ProporcionalPorDepartamento()
+
+
 def get_todas_las_expensas():
     return Expensa.objects.select_related('departamento__consorcio').order_by('-periodo', 'departamento__consorcio__nombre', 'departamento__numero')
 
@@ -28,39 +61,16 @@ def calcular_monto_departamento(departamento, periodo):
     consorcio = departamento.consorcio
     m2_depto = departamento.metros_cuadrados
     gastos = get_gastos_por_consorcio_periodo(consorcio, periodo)
-
-    # Calcular m2 totales del consorcio
-    deptos = consorcio.departamento_set.all()
-    m2_totales = sum(d.metros_cuadrados for d in deptos)
+    m2_totales = sum(d.metros_cuadrados for d in consorcio.departamento_set.all())
 
     if m2_totales == 0:
         return Decimal('0')
 
-    porcentaje = m2_depto / m2_totales
     total = Decimal('0')
-
     for gasto in gastos:
-        if gasto.tipo == 'ordinario':
-            total += gasto.monto * porcentaje
-
-        elif gasto.tipo == 'extraordinario':
-            if gasto.alcance == 'general':
-                total += gasto.monto * porcentaje
-
-            elif gasto.alcance == 'por_departamento':
-                deptos_involucrados = gasto.departamentos.all()
-                if departamento not in deptos_involucrados:
-                    continue
-                if gasto.prorrateo == 'igualitario':
-                    cantidad = deptos_involucrados.count()
-                    if cantidad > 0:
-                        total += gasto.monto / cantidad
-                else:
-                    m2_involucrados = sum(
-                        d.metros_cuadrados for d in deptos_involucrados
-                    )
-                    if m2_involucrados > 0:
-                        total += gasto.monto * (m2_depto / m2_involucrados)
+        contribucion = _estrategia_gasto(gasto).calcular(gasto, departamento, m2_depto, m2_totales)
+        if contribucion is not None:
+            total += contribucion
 
     return total.quantize(Decimal('0.01'))
 
@@ -110,34 +120,26 @@ def get_detalle_gastos_por_expensa(expensa):
     m2_totales = sum(d.metros_cuadrados for d in consorcio.departamento_set.all())
 
     detalle = []
+    subtotal_ordinario = Decimal('0')
+    subtotal_extraordinario = Decimal('0')
+
     for gasto in gastos:
-        contribucion = Decimal('0')
+        contribucion = _estrategia_gasto(gasto).calcular(gasto, departamento, m2_depto, m2_totales)
+        if contribucion is None:
+            continue
+        contribucion = contribucion.quantize(Decimal('0.01'))
+        detalle.append({'gasto': gasto, 'contribucion': contribucion})
         if gasto.tipo == 'ordinario':
-            if m2_totales > 0:
-                contribucion = gasto.monto * (m2_depto / m2_totales)
-        elif gasto.tipo == 'extraordinario':
-            if gasto.alcance == 'general':
-                if m2_totales > 0:
-                    contribucion = gasto.monto * (m2_depto / m2_totales)
-            elif gasto.alcance == 'por_departamento':
-                deptos_involucrados = gasto.departamentos.all()
-                if departamento not in deptos_involucrados:
-                    continue
-                if gasto.prorrateo == 'igualitario':
-                    cantidad = deptos_involucrados.count()
-                    if cantidad > 0:
-                        contribucion = gasto.monto / cantidad
-                else:
-                    m2_involucrados = sum(d.metros_cuadrados for d in deptos_involucrados)
-                    if m2_involucrados > 0:
-                        contribucion = gasto.monto * (m2_depto / m2_involucrados)
-        detalle.append({
-            'gasto': gasto,
-            'contribucion': contribucion.quantize(Decimal('0.01')),
-        })
+            subtotal_ordinario += contribucion
+        else:
+            subtotal_extraordinario += contribucion
+
+    detalle.sort(key=lambda x: 0 if x['gasto'].tipo == 'ordinario' else 1)
 
     return {
         'detalle': detalle,
+        'subtotal_ordinario': subtotal_ordinario,
+        'subtotal_extraordinario': subtotal_extraordinario,
         'total_consorcio': sum(g.monto for g in gastos),
     }
 

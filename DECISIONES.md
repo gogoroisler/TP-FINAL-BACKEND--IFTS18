@@ -52,6 +52,12 @@ El consorcista declara si es dueño o inquilino al solicitar la vinculación. Es
 
 La primera versión del formulario de `SolicitudVinculacion` tenía dos campos: `departamento` y `consorcio`. Esto generaba un problema de validación: el usuario podía seleccionar un consorcio que no correspondiera al departamento elegido. La solución fue eliminar `consorcio` del formulario y derivarlo automáticamente en `form_valid` a partir de `departamento.consorcio`. Un departamento siempre pertenece a un solo consorcio, así que la derivación es inequívoca.
 
+### Borrado lógico de usuarios
+
+Al "eliminar" un usuario desde el panel de administración, el sistema no borra el registro de la base de datos: en cambio setea `is_active = False` en el modelo `User` de Django. La razón es preservar la integridad referencial: un usuario borrado dejaría huérfanos sus reclamos, pagos y titularidades históricas, lo que rompe los registros pasados.
+
+Django ya provee el campo `is_active` en su modelo `User` nativo. El usuario desactivado no puede iniciar sesión, sigue apareciendo en el listado con badge "Inactivo", y puede ser reactivado desde "Editar usuario" sin pérdida de datos.
+
 ### Unique constraints
 
 Durante el desarrollo identificamos tres casos donde el modelo no impedía datos inconsistentes:
@@ -81,6 +87,12 @@ Elegimos la opción de signal (`post_save` y `post_delete` en `Pago`) porque per
 Decidimos no poner un tope máximo al monto de un pago: si el consorcista paga de más, el excedente queda como crédito a su favor (`saldo_pendiente < 0`). Ese crédito se muestra descontado automáticamente en la vista `/mis-expensas/`, reduciendo el saldo a pagar de las expensas impagas siguientes.
 
 La aplicación automática del crédito al generar nuevas expensas (descuento en origen) fue descartada por ahora y quedó registrada en el ROADMAP como mejora futura, porque implicaría cambios más profundos en el flujo de generación.
+
+### Strategy pattern para el cálculo de gastos
+
+El cálculo de la contribución de un departamento por cada gasto requiere distinguir entre 3 casos: prorrateo proporcional al consorcio (gastos ordinarios y extraordinarios generales), prorrateo igualitario por departamento, y prorrateo proporcional por departamento. Originalmente esta lógica estaba duplicada en dos funciones (`calcular_monto_departamento` y `get_detalle_gastos_por_expensa`) mediante bloques if/elif anidados.
+
+Refactorizamos a tres clases privadas (`_ProporcionConsorcio`, `_IgualitarioPorDepartamento`, `_ProporcionalPorDepartamento`) y una función fábrica `_estrategia_gasto(gasto)` que devuelve la estrategia correcta. Ambas funciones ahora delegan el cálculo sin duplicar lógica. La ventaja concreta: agregar un nuevo criterio de prorrateo en el futuro requiere una clase nueva, no modificar dos funciones.
 
 ### Conflicto de titulares: confirmación en dos pasos
 

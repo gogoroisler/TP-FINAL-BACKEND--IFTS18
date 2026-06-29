@@ -159,3 +159,9 @@ class EliminarUsuarioView(RolRequeridoMixin, DeleteView):
     template_name = 'usuarios_admin/eliminar.html'
     success_url = reverse_lazy('listar_usuarios')
     pk_url_kwarg = 'usuario_id'
+
+    def form_valid(self, form):
+        usuario = self.get_object()
+        usuario.is_active = False
+        usuario.save(update_fields=['is_active'])
+        return redirect(self.success_url)

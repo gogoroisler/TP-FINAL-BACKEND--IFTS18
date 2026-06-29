@@ -85,18 +85,22 @@
                 </td>
                 <td class="px-4 py-3 text-sm text-slate-500">{{ reclamo.fecha_creacion|date:"d/m/Y" }}</td>
                 <td class="px-4 py-3">
-                    <form method="post" action="{% url 'actualizar_estado' reclamo.id %}" class="flex items-center gap-2">
+                    <form method="post" action="{% url 'actualizar_estado' reclamo.id %}" class="flex flex-col gap-2">
                         {% csrf_token %}
-                        <select name="estado"
-                                class="border border-slate-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                            <option value="pendiente" {% if reclamo.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
-                            <option value="en_proceso" {% if reclamo.estado == 'en_proceso' %}selected{% endif %}>En proceso</option>
-                            <option value="resuelto" {% if reclamo.estado == 'resuelto' %}selected{% endif %}>Resuelto</option>
-                        </select>
-                        <button type="submit"
-                                class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-md text-xs font-medium transition-colors">
-                            Actualizar
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <select name="estado"
+                                    class="border border-slate-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                <option value="pendiente" {% if reclamo.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                                <option value="en_proceso" {% if reclamo.estado == 'en_proceso' %}selected{% endif %}>En proceso</option>
+                                <option value="resuelto" {% if reclamo.estado == 'resuelto' %}selected{% endif %}>Resuelto</option>
+                            </select>
+                            <button type="submit"
+                                    class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-md text-xs font-medium transition-colors">
+                                Actualizar
+                            </button>
+                        </div>
+                        <textarea name="nota_respuesta" rows="2" placeholder="Nota de respuesta (opcional)"
+                                  class="border border-slate-300 rounded-md px-2 py-1.5 text-sm w-full focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none">{{ reclamo.nota_respuesta }}</textarea>
                     </form>
                 </td>
             </tr>

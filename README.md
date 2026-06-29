@@ -259,18 +259,19 @@ python manage.py runserver
 - Cargar y gestionar gastos del consorcio por período y proveedor
 - Generar expensas con vista previa y cálculo automático
 - Ver y gestionar todas las expensas con filtros por consorcio, período y departamento
-- Ver reclamos con filtros por consorcio y estado; actualizar estado de cada reclamo
+- Ver reclamos con filtros por consorcio y estado; actualizar estado y agregar nota de respuesta a cada reclamo
 - Ver avisos con filtro por consorcio; crear y editar avisos por consorcio
 - Ver gastos con filtros por consorcio, proveedor y período
 - Ver departamentos con filtro por consorcio
 - Ver titularidades con filtros por consorcio y departamento
+- Desactivar usuarios en lugar de eliminarlos (borrado lógico, datos conservados y recuperables)
 
 ### Consorcista
 - Solicitar vinculación a un consorcio y departamento indicando su condición (dueño o inquilino)
 - Ver sus expensas ordenadas por período, informar pagos (parciales o totales) y visualizar crédito disponible
-- Ver el detalle de cada expensa: composición de gastos del período con el monto que le corresponde por departamento
+- Ver el detalle de cada expensa: composición de gastos agrupada por tipo (ordinarios / extraordinarios) con subtotales y monto a pagar por departamento
 - Descargar o imprimir el detalle de una expensa en PDF desde el navegador
-- Crear y ver sus reclamos
+- Crear y ver sus reclamos; ver la nota de respuesta del administrador en cada reclamo
 - Ver los avisos activos de su consorcio
 
 ---

@@ -187,20 +187,28 @@ expensas: 0001→0003
 - Confirmación al crear Titularidad con conflicto (dos pasos)
 - Unique constraints: Consorcio.cuit, Proveedor.cuit, Departamento(consorcio+numero)
 - Error reclamo sin departamento: mensaje amigable, no 500
-- Detalle de expensa para el consorcista (`/mis-expensas/<id>/`): composición de gastos del período con contribución por departamento, historial de pagos, botón imprimir/PDF (window.print + @media print)
+- Detalle de expensa para el consorcista (`/mis-expensas/<id>/`): gastos agrupados por tipo (ordinarios/extraordinarios) con subtotales, contribución por departamento, historial de pagos, botón imprimir/PDF
+- Strategy pattern en cálculo de gastos: `_ProporcionConsorcio`, `_IgualitarioPorDepartamento`, `_ProporcionalPorDepartamento` — sin if/elif duplicados en selectors.py
 - Filtros GET en todos los listados del admin: expensas (consorcio/período/departamento), reclamos (consorcio/estado), avisos (consorcio), gastos (consorcio/proveedor/período), departamentos (consorcio), titularidades (consorcio/departamento con dropdown cascading via onchange)
 - Listado de usuarios con columna "Vinculaciones activas" (Prefetch con to_attr) y filtros por rol, consorcio y departamento
-- Documentación completa: README.md, ROADMAP.md, DECISIONES.md (arquitectura, modelo, lógica, bugs, filtros, uso de IA)
+- Nota de respuesta del admin en reclamos (`nota_respuesta`), visible por el consorcista en "Mis Reclamos"
+- Borrado lógico de usuarios: `EliminarUsuarioView.form_valid` setea `is_active=False` en lugar de borrar el registro
+- Input `type="month"` en formularios de gastos y expensas (YYYY-MM garantizado por el browser)
+- Páginas de error 404 y 500 personalizadas con diseño Tailwind
+- Documentación completa: README.md, ROADMAP.md, DECISIONES.md, .github/skills/contexto-tp/SKILL.md
 
 ## Lo que falta (ver ROADMAP.md)
 
 - Notificaciones por email
-- Reclamos con comentarios y categorías
+- Categorías en reclamos (nota_respuesta ya implementada)
 - Dashboard con métricas reales
 - Reportes exportables para el admin (PDF/Excel)
 - Paginación en listados
 - Registro de auditoría
 - API REST
 - Tests automatizados
-- Sistema de crédito automático entre períodos (hoy se muestra pero no se descuenta al generar)
+- Sistema de crédito automático entre períodos
 - Múltiples vinculaciones y desvinculación por el consorcista
+- Intereses por mora
+- Cierre de período formal
+- Modo oscuro/claro (backlog)

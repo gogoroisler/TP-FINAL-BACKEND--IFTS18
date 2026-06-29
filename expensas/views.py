@@ -1,3 +1,4 @@
+from django import forms as django_forms
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
@@ -84,6 +85,11 @@ class CrearExpensaView(RolRequeridoMixin, CreateView):
     fields = ['departamento', 'periodo', 'fecha_vencimiento']
     success_url = reverse_lazy('listar_expensas')
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['periodo'].widget = django_forms.TextInput(attrs={'type': 'month'})
+        return form
+
 
 @method_decorator(login_required, name='dispatch')
 class EditarExpensaView(RolRequeridoMixin, UpdateView):
@@ -93,6 +99,11 @@ class EditarExpensaView(RolRequeridoMixin, UpdateView):
     fields = ['departamento', 'periodo', 'fecha_vencimiento', 'pagada']
     success_url = reverse_lazy('listar_expensas')
     pk_url_kwarg = 'expensa_id'
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['periodo'].widget = django_forms.TextInput(attrs={'type': 'month'})
+        return form
 
 
 @method_decorator(login_required, name='dispatch')
@@ -220,6 +231,11 @@ class CrearGastoView(RolRequeridoMixin, CreateView):
     fields = ['consorcio', 'proveedor', 'periodo', 'descripcion', 'monto', 'tipo', 'alcance', 'prorrateo', 'departamentos']
     success_url = reverse_lazy('listar_gastos')
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['periodo'].widget = django_forms.TextInput(attrs={'type': 'month'})
+        return form
+
 
 @method_decorator(login_required, name='dispatch')
 class EditarGastoView(RolRequeridoMixin, UpdateView):
@@ -229,6 +245,11 @@ class EditarGastoView(RolRequeridoMixin, UpdateView):
     fields = ['consorcio', 'proveedor', 'periodo', 'descripcion', 'monto', 'tipo', 'alcance', 'prorrateo', 'departamentos']
     success_url = reverse_lazy('listar_gastos')
     pk_url_kwarg = 'gasto_id'
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['periodo'].widget = django_forms.TextInput(attrs={'type': 'month'})
+        return form
 
 
 @method_decorator(login_required, name='dispatch')
