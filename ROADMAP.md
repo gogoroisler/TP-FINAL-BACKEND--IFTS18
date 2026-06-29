@@ -8,8 +8,8 @@
 **2. Notificaciones por email**
 Hoy no existe ningún canal de comunicación automática. Con el sistema de email de Django (sin librerías externas) se puede notificar al consorcista cuando su solicitud es aprobada/rechazada, cuando vence una expensa, o cuando cambia el estado de su reclamo.
 
-**3. Reclamos: comentarios y categorías**
-El modelo actual es muy básico. Agregarle categorías (rotura, ruido, limpieza, plagas...) y un sistema de respuestas entre admin y consorcista lo convierte en un canal de comunicación real en lugar de un simple formulario de queja.
+**3. ~~Reclamos: respuesta del admin~~ ✅ Implementado / Categorías pendientes**
+El admin puede escribir una nota de respuesta al actualizar el estado de un reclamo. El consorcista la ve en "Mis Reclamos". Lo que queda pendiente es agregar categorías al reclamo (rotura, ruido, limpieza, plagas...) para facilitar la gestión y el filtrado.
 
 ---
 
@@ -40,28 +40,43 @@ La lógica de cálculo de expensas (4 combinaciones de tipo/alcance/prorrateo) e
 **10. Docker + CI/CD**
 Para que el proyecto pueda desplegarse en cualquier servidor sin depender del ambiente local. GitHub Actions para correr los tests automáticamente en cada push.
 
-**13. Logging estructurado de errores**
-Hoy los errores de servidor (500) no dejan rastro registrado. Configurar el sistema de logging de Django para escribir errores a un archivo o servicio externo (Sentry, Logtail) permite diagnosticar problemas en producción sin acceso directo al servidor.
-
-**14. Protección ante volúmenes extremos de datos**
-Sin paginación ni límites en los querysets, un listado con miles de registros puede volverse lento o consumir memoria excesiva. Agregar paginación nativa de Django y limitar los querysets más pesados es la mitigación directa.
-
----
-
 **11. Múltiples vinculaciones y desvinculación por el consorcista**
 Hoy un consorcista solo puede tener una vinculación activa a la vez. La mejora implicaría permitir que un consorcista solicite vinculación a más de un departamento simultáneamente (por ejemplo, si administra dos unidades), y que pueda solicitar su propia desvinculación sin necesidad de que el admin retire los permisos manualmente. Requiere refactorizar `MisExpensasView` para agrupar expensas por departamento y actualizar la lógica de solicitudes.
 
 **12. Sistema de crédito automático entre períodos**
 Hoy el crédito por sobrepago se muestra en la vista del consorcista pero no se aplica automáticamente al generar la expensa del próximo período. La mejora implicaría un campo `credito` en `Perfil` o un modelo `CreditoConsorcista` que acumule saldos a favor y los descuente al crear nuevas expensas, sin intervención del admin.
 
+**13. Intereses por mora**
+Las expensas vencen pero no hay penalidad por pago tardío. Implementar un cálculo de interés requiere definir la tasa, la frecuencia de aplicación y cómo se expone al consorcista. Es lógica contable con múltiples variantes según la normativa del consorcio.
+
+**14. Cierre de período formal**
+Hoy un admin puede seguir cargando gastos de un período ya liquidado sin ninguna advertencia. Un mecanismo de cierre bloquearía modificaciones a gastos y expensas de períodos anteriores, garantizando integridad contable.
+
+**15. Logging estructurado de errores**
+Hoy los errores de servidor (500) no dejan rastro registrado. Configurar el sistema de logging de Django para escribir errores a un archivo o servicio externo (Sentry, Logtail) permite diagnosticar problemas en producción sin acceso directo al servidor.
+
+**16. Paginación en listados**
+Sin paginación, un listado con miles de registros puede volverse lento. Agregar paginación nativa de Django es la mitigación directa.
+
+---
+
+## Backlog
+
+**Modo oscuro / modo claro**
+Requiere agregar el prefijo `dark:` de Tailwind a todos los templates y un toggle JS. Conveniente hacerlo si el proyecto migra a Tailwind con build step (npm), ya que con CDN implica revisar cada clase de color en más de 20 archivos.
+
 ---
 
 ## Lo que está sólido y no se toca
 
 - Arquitectura (CBV + selectors + RolRequeridoMixin) bien pensada y escalable.
+- Cálculo de gastos con Strategy pattern: `_ProporcionConsorcio`, `_IgualitarioPorDepartamento`, `_ProporcionalPorDepartamento` — sin if/elif duplicados.
 - Flujo de vinculación con manejo de conflictos de titulares correctamente resuelto.
 - Cálculo de expensas con los 4 casos de prorrateo (ordinario/extraordinario × proporcional/igualitario).
-- Diseño con Tailwind CSS aplicado en todos los templates.
+- Diseño con Tailwind CSS aplicado en todos los templates. Páginas de error 404 y 500 personalizadas.
 - CRUD completo sin Django Admin: consorcios, departamentos, titularidades, proveedores, gastos, usuarios y perfiles tienen vistas propias con Tailwind.
-- Detalle de expensa por consorcista: composición de gastos del período con contribución por departamento y descarga en PDF.
+- Detalle de expensa por consorcista: composición de gastos agrupada por tipo (ordinarios / extraordinarios) con subtotales y descarga en PDF.
 - Filtros en todos los listados del administrador (expensas, reclamos, avisos, gastos, departamentos, titularidades).
+- Nota de respuesta del admin en reclamos, visible por el consorcista en "Mis Reclamos".
+- Borrado lógico de usuarios: desactivación en lugar de eliminación, datos conservados y recuperables.
+- Validación de formato de período (YYYY-MM) reforzada con input type month en formularios.
