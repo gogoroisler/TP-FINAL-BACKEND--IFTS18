@@ -57,37 +57,45 @@
     <p class="text-xs text-slate-500 mb-4">Gastos del consorcio en el período {{ expensa.periodo }} y la parte que le corresponde a su departamento.</p>
 
     {% if detalle_gastos.detalle %}
+    {% regroup detalle_gastos.detalle by gasto.tipo as grupos %}
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
             <thead>
                 <tr class="border-b border-slate-200 text-left">
                     <th class="pb-2 font-medium text-slate-600">Proveedor</th>
                     <th class="pb-2 font-medium text-slate-600">Descripción</th>
-                    <th class="pb-2 font-medium text-slate-600">Tipo</th>
                     <th class="pb-2 font-medium text-slate-600 text-right">Total consorcio</th>
                     <th class="pb-2 font-medium text-slate-600 text-right">Su parte</th>
                 </tr>
             </thead>
             <tbody>
-                {% for item in detalle_gastos.detalle %}
+                {% for grupo in grupos %}
+                <tr class="bg-slate-50">
+                    <td colspan="4" class="px-2 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                        {% if grupo.grouper == 'ordinario' %}Gastos ordinarios{% else %}Gastos extraordinarios{% endif %}
+                    </td>
+                </tr>
+                {% for item in grupo.list %}
                 <tr class="border-b border-slate-100">
                     <td class="py-2 text-slate-700">{{ item.gasto.proveedor.nombre }}</td>
                     <td class="py-2 text-slate-700">{{ item.gasto.descripcion }}</td>
-                    <td class="py-2">
-                        {% if item.gasto.tipo == 'ordinario' %}
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700">Ordinario</span>
-                        {% else %}
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700">Extraordinario</span>
-                        {% endif %}
-                    </td>
                     <td class="py-2 text-right text-slate-700">${{ item.gasto.monto }}</td>
                     <td class="py-2 text-right font-medium text-slate-800">${{ item.contribucion }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="border-t border-slate-200 bg-slate-50">
+                    <td colspan="3" class="py-1.5 pr-2 text-xs text-right text-slate-500">
+                        Subtotal {% if grupo.grouper == 'ordinario' %}ordinarios{% else %}extraordinarios{% endif %}
+                    </td>
+                    <td class="py-1.5 text-right text-sm font-semibold text-slate-700">
+                        ${% if grupo.grouper == 'ordinario' %}{{ detalle_gastos.subtotal_ordinario }}{% else %}{{ detalle_gastos.subtotal_extraordinario }}{% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
             <tfoot>
                 <tr class="border-t-2 border-slate-300">
-                    <td colspan="3" class="pt-3 text-sm font-semibold text-slate-700">Total del período</td>
+                    <td colspan="2" class="pt-3 text-sm font-semibold text-slate-700">Total del período</td>
                     <td class="pt-3 text-right font-semibold text-slate-700">${{ detalle_gastos.total_consorcio }}</td>
                     <td class="pt-3 text-right font-bold text-slate-900">${{ expensa.monto }}</td>
                 </tr>

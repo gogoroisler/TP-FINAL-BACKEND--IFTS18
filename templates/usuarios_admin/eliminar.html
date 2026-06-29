@@ -1,29 +1,29 @@
 {% extends 'base.html' %}
-{% block title %}Eliminar usuario{% endblock %}
+{% block title %}Desactivar usuario{% endblock %}
 {% block content %}
 
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-slate-800">Eliminar usuario</h1>
+    <h1 class="text-2xl font-bold text-slate-800">Desactivar usuario</h1>
 </div>
 
 <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-6 max-w-md">
     <div class="flex items-start gap-3 mb-6">
-        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
             </svg>
         </div>
         <div>
-            <p class="text-slate-800 font-medium">¿Seguro que querés eliminar este usuario?</p>
+            <p class="text-slate-800 font-medium">¿Seguro que querés desactivar este usuario?</p>
             <p class="text-slate-500 text-sm mt-1">{{ object.username }}</p>
-            <p class="text-red-600 text-xs mt-2">Esta acción eliminará también su perfil y titularidades.</p>
+            <p class="text-slate-500 text-xs mt-2">El usuario quedará inactivo pero sus datos se conservan. Podés reactivarlo desde Editar usuario.</p>
         </div>
     </div>
     <form method="post" class="flex gap-3">
         {% csrf_token %}
         <button type="submit"
-                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md font-medium transition-colors text-sm">
-            Confirmar eliminación
+                class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-md font-medium transition-colors text-sm">
+            Confirmar desactivación
         </button>
         <a href="{% url 'listar_usuarios' %}"
            class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-4 py-2 rounded-md font-medium transition-colors text-sm">
