@@ -75,7 +75,7 @@ def actualizar_estado(request, reclamo_id):
         return render(request, 'sin_permiso.html')
     reclamo = get_object_or_404(Reclamo, id=reclamo_id)
     if request.method == 'POST':
-        estado = request.POST.get('estado')
-        reclamo.estado = estado
+        reclamo.estado = request.POST.get('estado')
+        reclamo.nota_respuesta = request.POST.get('nota_respuesta', '')
         reclamo.save()
     return redirect('listar_reclamos')

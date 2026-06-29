@@ -24,22 +24,26 @@
                 <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Título</th>
                 <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Descripción</th>
                 <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Estado</th>
+                <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Respuesta del admin</th>
                 <th class="text-left px-4 py-3 text-sm font-medium text-slate-500">Fecha</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-slate-200">
             {% for reclamo in reclamos %}
-            <tr class="hover:bg-slate-50">
+            <tr class="hover:bg-slate-50 align-top">
                 <td class="px-4 py-3 text-sm text-slate-800 font-medium">{{ reclamo.titulo }}</td>
                 <td class="px-4 py-3 text-sm text-slate-500 max-w-xs">{{ reclamo.descripcion }}</td>
                 <td class="px-4 py-3">
                     {% if reclamo.estado == 'pendiente' %}
                         <span class="px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">{{ reclamo.get_estado_display }}</span>
                     {% elif reclamo.estado == 'en_proceso' %}
-                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700">{{ reclamo.get_estado_display }}</span>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">{{ reclamo.get_estado_display }}</span>
                     {% else %}
                         <span class="px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">{{ reclamo.get_estado_display }}</span>
                     {% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-600">
+                    {{ reclamo.nota_respuesta|default:"—" }}
                 </td>
                 <td class="px-4 py-3 text-sm text-slate-500">{{ reclamo.fecha_creacion|date:"d/m/Y" }}</td>
             </tr>

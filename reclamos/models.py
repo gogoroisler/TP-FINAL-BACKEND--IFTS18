@@ -25,6 +25,7 @@ class Reclamo(models.Model):
         choices=ESTADO_CHOICES,
         default='pendiente'
     )
+    nota_respuesta = models.TextField(blank=True, default='')
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
